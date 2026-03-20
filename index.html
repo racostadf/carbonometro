@@ -552,23 +552,56 @@
     }
     .timeline-text { font-size: 0.82rem; color: var(--text-2); line-height: 1.6; max-width: 560px; }
 
+    /* ─── BRASIL CONTEXT ─── */
+    .brasil-section {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .brasil-inner {
+      max-width: 1040px; margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+    .brasil-grid {
+      margin-top: 3rem;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--border);
+    }
+    @media (max-width: 680px) { .brasil-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 400px) { .brasil-grid { grid-template-columns: 1fr; } }
+
+    .brasil-card {
+      background: var(--bg-2); padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .brasil-val {
+      font-family: var(--mono); font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 300; color: var(--text); line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .brasil-desc { font-size: 0.8rem; color: var(--text-2); line-height: 1.5; }
+    .brasil-source { font-family: var(--mono); font-size: 0.55rem; color: var(--text-3); letter-spacing: 0.08em; margin-top: 0.25rem; }
+
     /* ─── FOOTER ─── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 2.5rem 2rem;
+      padding: 3rem 2rem;
       max-width: 1040px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1rem;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      flex-wrap: wrap; gap: 2rem;
     }
+
+    .footer-col { display: flex; flex-direction: column; gap: 0.75rem; }
 
     .footer-logo {
       font-family: var(--display); font-size: 1.1rem; font-weight: 400;
       color: var(--green-light); text-decoration: none; letter-spacing: -0.02em;
     }
     .footer-logo em { font-style: italic; font-weight: 200; color: var(--text-3); }
+    .footer-mission { font-size: 0.78rem; color: var(--text-3); max-width: 200px; line-height: 1.5; }
 
     .footer-links {
-      display: flex; gap: 2rem; flex-wrap: wrap;
+      display: flex; flex-direction: column; gap: 0.6rem;
     }
     .footer-links a {
       font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
@@ -577,7 +610,21 @@
     }
     .footer-links a:hover { color: var(--green-light); }
 
-    .footer-note { font-family: var(--mono); font-size: 0.56rem; color: var(--text-3); letter-spacing: 0.04em; }
+    .footer-contact {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em;
+      color: var(--text-3); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-contact:hover { color: var(--green-light); }
+
+    .footer-social { display: flex; gap: 0.75rem; align-items: center; }
+    .footer-social-link {
+      color: var(--text-3); text-decoration: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s;
+    }
+    .footer-social-link:hover { color: var(--green-light); }
+
+    .footer-note { font-family: var(--mono); font-size: 0.56rem; color: var(--text-3); letter-spacing: 0.04em; max-width: 220px; line-height: 1.6; }
 
     /* ─── REVEAL ─── */
     .appear { opacity: 0; transform: translateY(26px); transition: opacity 0.65s ease, transform 0.65s ease; }
@@ -605,8 +652,8 @@
       .timeline { padding-left: 1.5rem; }
       .section-wrap { padding: 4rem 1.4rem; }
       .gas-grid { grid-template-columns: 1fr 1fr; }
-      footer { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
-      .footer-links { flex-wrap: wrap; gap: 0.75rem; }
+      footer { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+      .footer-links { flex-direction: row; flex-wrap: wrap; gap: 0.75rem; }
     }
     @media (max-width: 400px) {
       .stats-inner { grid-template-columns: 1fr; }
@@ -898,6 +945,47 @@
   </div>
 </section>
 
+<!-- ═══ CONTEXTO BRASIL ═══ -->
+<section class="brasil-section">
+  <div class="brasil-inner">
+    <div class="appear">
+      <p class="section-eyebrow">// o brasil no mapa climático</p>
+      <h2 class="section-title">Um perfil de emissões<br><em>único no mundo</em></h2>
+      <p class="section-lead">
+        O Brasil combina uma matriz elétrica quase totalmente renovável com altas emissões de desmatamento e agropecuária — um paradoxo que exige ferramentas de medição específicas.
+      </p>
+    </div>
+
+    <div class="brasil-grid">
+
+      <div class="brasil-card appear d1">
+        <div class="brasil-val">~85<span>%</span></div>
+        <div class="brasil-desc">Matriz elétrica renovável — um dos menores fatores de emissão por kWh do mundo</div>
+        <div class="brasil-source">EPE 2023</div>
+      </div>
+
+      <div class="brasil-card appear d2">
+        <div class="brasil-val">~50<span>%</span></div>
+        <div class="brasil-desc">Das emissões nacionais vêm do desmatamento e uso da terra (Amazônia + Cerrado)</div>
+        <div class="brasil-source">SEEG 2023</div>
+      </div>
+
+      <div class="brasil-card appear d3">
+        <div class="brasil-val">~30<span>%</span></div>
+        <div class="brasil-desc">Das emissões provêm da agropecuária — gado, fertilizantes e cultivo de arroz</div>
+        <div class="brasil-source">SEEG 2023</div>
+      </div>
+
+      <div class="brasil-card appear d4">
+        <div class="brasil-val">−50<span>%</span></div>
+        <div class="brasil-desc">Meta NDC: reduzir emissões até 2030 em relação a 2005 (revisão 2023)</div>
+        <div class="brasil-source">MMA 2023</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ═══ PATHS / CALCULADORAS ═══ -->
 <section id="calculadoras" class="paths-section">
   <div class="paths-inner">
@@ -1015,14 +1103,60 @@
 
 <!-- ─── FOOTER ─── -->
 <footer>
-  <a href="#" class="footer-logo">CarbonôMetro <em>Brasil</em></a>
-  <div class="footer-links">
-    <a href="pessoal.html">Calculadora Pessoal</a>
-    <a href="empresarial.html">Calculadora Empresarial</a>
-    <a href="#o-que-e">O que é</a>
-    <a href="#como-medimos">Metodologia</a>
+
+  <!-- Col 1: Logo + missão -->
+  <div class="footer-col">
+    <a href="#" class="footer-logo">CarbonôMetro <em>Brasil</em></a>
+    <p class="footer-mission">Tornar a pegada de carbono compreensível para todo brasileiro.</p>
   </div>
-  <div class="footer-note">MCTI 2023 · SEEG · IPCC AR6 · Valores estimativos para fins educacionais</div>
+
+  <!-- Col 2: Navegação -->
+  <div class="footer-col">
+    <div class="footer-links">
+      <a href="pessoal.html">Calculadora Pessoal</a>
+      <a href="empresarial.html">Calculadora Empresarial</a>
+      <a href="#o-que-e">O que é</a>
+      <a href="#como-medimos">Metodologia</a>
+    </div>
+  </div>
+
+  <!-- Col 3: Contato + redes sociais -->
+  <div class="footer-col">
+    <!-- TODO: substituir email -->
+    <a href="mailto:contato@carbonometro.com.br" class="footer-contact">contato@carbonometro.com.br</a>
+
+    <div class="footer-social">
+
+      <!-- GitHub (link real) -->
+      <a href="https://github.com/racostadf/carbonometro" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+      </a>
+
+      <!-- TODO: substituir URL -->
+      <a href="https://linkedin.com/in/seu-perfil" class="footer-social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+      </a>
+
+      <!-- TODO: substituir URL -->
+      <a href="https://instagram.com/carbonometro" class="footer-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+      </a>
+
+    </div>
+
+    <div class="footer-note">MCTI 2023 · SEEG · IPCC AR6 · Valores estimativos para fins educacionais</div>
+  </div>
+
 </footer>
 
 <script>

@@ -116,6 +116,44 @@
     }
     .logo em { font-style: italic; font-weight: 200; color: var(--text-3); }
 
+    /* ─── GLOW + FOLHAS ─── */
+    .page-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 30%, rgba(35, 85, 15, 0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 40% at 15% 85%, rgba(20, 50, 10, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 30% at 85% 15%, rgba(10, 35, 5, 0.10) 0%, transparent 60%);
+    }
+    [data-theme="light"] .page-glow {
+      background:
+        radial-gradient(ellipse 75% 65% at 50% 40%, rgba(40,105,18,0.20) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.15) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.13)  0%, transparent 55%);
+    }
+
+    .leaf {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.04;
+    }
+    .leaf-1 { top: 10%; left: 5%;  width: 200px; transform: rotate(-20deg); }
+    .leaf-2 { bottom: 15%; right: 3%; width: 280px; transform: rotate(30deg); }
+    .leaf-3 { top: 35%; right: 6%;  width: 140px; transform: rotate(-50deg); opacity: 0.03; }
+    .leaf-4 { top: 60%; right: 18%; width: 90px;  transform: rotate(18deg);  opacity: 0.03; }
+    .leaf-5 { top: 55%; left: 8%;  width: 85px;  transform: rotate(-65deg) scaleX(-1); opacity: 0.03; }
+
+    [data-theme="light"] .leaf   { opacity: 0.13; }
+    [data-theme="light"] .leaf-3 { opacity: 0.09; }
+    [data-theme="light"] .leaf-4 { opacity: 0.08; }
+    [data-theme="light"] .leaf-5 { opacity: 0.08; }
+
+    /* conteúdo acima do glow/folhas */
+    .page-wrap { position: relative; z-index: 1; }
+
     /* ─── MAIN CONTENT ─── */
     .page-wrap {
       max-width: 900px;
@@ -442,6 +480,36 @@
   </style>
 </head>
 <body>
+
+<!-- Glow atmosférico -->
+<div class="page-glow"></div>
+
+<!-- Folhas decorativas -->
+<svg class="leaf leaf-1" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+  <line x1="100" y1="180" x2="60" y2="140" stroke="#5da83c" stroke-width="0.8"/>
+  <line x1="100" y1="200" x2="140" y2="160" stroke="#5da83c" stroke-width="0.8"/>
+  <line x1="100" y1="140" x2="65" y2="100" stroke="#5da83c" stroke-width="0.8"/>
+  <line x1="100" y1="150" x2="135" y2="110" stroke="#5da83c" stroke-width="0.8"/>
+</svg>
+<svg class="leaf leaf-2" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+  <line x1="100" y1="180" x2="60" y2="140" stroke="#5da83c" stroke-width="0.8"/>
+  <line x1="100" y1="200" x2="140" y2="160" stroke="#5da83c" stroke-width="0.8"/>
+</svg>
+<svg class="leaf leaf-3" viewBox="0 0 200 300" fill="none">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+</svg>
+<svg class="leaf leaf-4" viewBox="0 0 200 300" fill="none">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+</svg>
+<svg class="leaf leaf-5" viewBox="0 0 200 300" fill="none">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+</svg>
 
 <!-- ═══ HEADER ═══ -->
 <header>

@@ -269,49 +269,65 @@
     .lead-card {
       background: var(--surface);
       border: 1px solid var(--border-bright);
-      border-radius: 12px;
-      padding: 2rem;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
       margin-bottom: 2rem;
       text-align: center;
     }
     .lead-title {
-      font-family: var(--display); font-size: 1.4rem; font-weight: 400;
-      margin-bottom: 0.4rem;
+      font-family: var(--display); font-size: 1.7rem; font-weight: 400;
+      margin-bottom: 0.5rem; line-height: 1.2;
     }
-    .lead-sub { font-size: 0.85rem; color: var(--text-2); margin-bottom: 1.5rem; }
+    .lead-title em { font-style: italic; font-weight: 200; color: var(--green-light); }
+    .lead-sub { font-size: 0.88rem; color: var(--text-2); margin-bottom: 1.8rem; line-height: 1.6; }
     .lead-form {
       display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;
     }
     .lead-form input {
       background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.65rem 1rem;
-      color: var(--text); font-family: var(--body); font-size: 0.9rem;
+      border-radius: 10px; padding: 0.8rem 1.2rem;
+      color: var(--text); font-family: var(--body); font-size: 0.95rem;
       min-width: 200px; flex: 1;
       outline: none; transition: border-color 0.2s;
     }
     .lead-form input:focus { border-color: var(--green); }
     .lead-form button {
       background: var(--green); color: #fff; border: none;
-      border-radius: 8px; padding: 0.65rem 1.6rem;
-      font-family: var(--body); font-size: 0.9rem; font-weight: 700;
-      cursor: pointer; transition: background 0.2s;
+      border-radius: 10px; padding: 0.8rem 2rem;
+      font-family: var(--body); font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, transform 0.2s;
     }
-    .lead-form button:hover { background: var(--green-light); }
-    .lead-thanks {
-      display: none; color: var(--green-light);
-      font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.08em;
-    }
+    .lead-form button:hover { background: var(--green-light); transform: translateY(-1px); }
 
-    /* ─── PDF BUTTON ─── */
-    .pdf-wrap { text-align: center; margin-bottom: 3rem; }
-    .btn-pdf {
-      background: none; border: 1px solid var(--border-bright);
-      border-radius: 8px; padding: 0.7rem 2rem;
-      color: var(--text-2); font-family: var(--body); font-size: 0.9rem;
-      cursor: pointer; transition: color 0.2s, border-color 0.2s;
-      display: inline-flex; align-items: center; gap: 0.6rem;
+    /* ─── PÓS-LEAD: BOTÃO CHAMATIVO ─── */
+    .lead-thanks { display: none; }
+    .thanks-greeting {
+      font-family: var(--display); font-size: 1.1rem; font-weight: 400;
+      color: var(--green-light); margin-bottom: 0.3rem;
     }
-    .btn-pdf:hover { color: var(--green-light); border-color: var(--green-light); }
+    .thanks-sub {
+      font-size: 0.85rem; color: var(--text-2); margin-bottom: 2rem; line-height: 1.5;
+    }
+    .btn-pdf {
+      display: block; width: 100%; max-width: 520px; margin: 0 auto 0.75rem;
+      padding: 1.3rem 2rem;
+      background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+      color: #fff; border: none; border-radius: 14px;
+      font-family: var(--display); font-size: 1.35rem; font-weight: 400;
+      letter-spacing: -0.01em; cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 4px 28px rgba(93,168,60,0.35);
+      display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+    }
+    .btn-pdf:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(93,168,60,0.45);
+    }
+    .btn-pdf:active { transform: translateY(-1px); }
+    .pdf-note {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+      color: var(--text-3); text-transform: uppercase; margin-top: 0.5rem;
+    }
 
     /* ─── FALLBACK ─── */
     .no-data {
@@ -589,19 +605,30 @@
 
   </div>
 
-  <!-- Lead Capture -->
+  <!-- Lead Capture + PDF -->
   <div class="lead-card">
-    <div class="lead-title">Receba seu relatório completo</div>
-    <div class="lead-sub">Deixe seu nome e e-mail para receber dicas personalizadas baseadas na sua pegada.</div>
     <div id="leadFormWrap">
+      <div class="lead-title">Baixe seu <em>relatório</em> personalizado</div>
+      <div class="lead-sub">Informe seus dados para gerar um PDF completo com sua análise, equivalências, metas climáticas e plano de ação personalizado.</div>
       <form class="lead-form" onsubmit="submitLead(event)">
         <input type="text" id="leadNome" placeholder="Seu nome" required autocomplete="name">
         <input type="email" id="leadEmail" placeholder="Seu e-mail" required autocomplete="email">
-        <button type="submit">Enviar</button>
+        <button type="submit">Gerar relatório</button>
       </form>
     </div>
     <div class="lead-thanks" id="leadThanks">
-      Obrigado! Seus dados foram salvos.
+      <div class="thanks-greeting" id="thanksGreeting">Pronto!</div>
+      <div class="thanks-sub">Seu relatório personalizado foi gerado. Clique abaixo para baixar.</div>
+      <button class="btn-pdf" id="btnPdf" onclick="generatePDF()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 18 15 15"/>
+        </svg>
+        Baixar meu relatório PDF
+      </button>
+      <div class="pdf-note">PDF completo · 1 página A4 · Análise personalizada</div>
     </div>
   </div>
 
@@ -677,18 +704,6 @@
     </div>
   </div>
 
-  <!-- PDF Button -->
-  <div class="pdf-wrap">
-    <button class="btn-pdf" id="btnPdf" onclick="generatePDF()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="12" y1="18" x2="12" y2="12"/>
-        <polyline points="9 15 12 18 15 15"/>
-      </svg>
-      Baixar PDF
-    </button>
-  </div>
 
 </div>
 
@@ -880,6 +895,7 @@
     localStorage.setItem('cm_leads', JSON.stringify(leads));
 
     document.getElementById('leadFormWrap').style.display = 'none';
+    document.getElementById('thanksGreeting').textContent = 'Pronto, ' + nome.split(' ')[0] + '!';
     const thanks = document.getElementById('leadThanks');
     thanks.style.display = 'block';
   }
@@ -1027,7 +1043,6 @@
       hline(y+2, GREEN, 0.4);
       y += 8;
 
-      font(7, 'normal'); rgb(INK);
       const metaRows = [
         { label: 'Meta 1,5°C (IPCC)',   target: 2000, unit: '2,0 t/ano' },
         { label: 'Meta 2°C (IPCC)',      target: 3300, unit: '3,3 t/ano' },
@@ -1047,8 +1062,65 @@
         txt(row.unit, W-MR-2, y+5.5, { align: 'right' });
         y += 8;
       });
+      y += 6;
 
-      y += 5;
+      // ── SEÇÃO 4: EQUIVALÊNCIAS ──
+      font(7, 'bold'); rgb(INK2);
+      txt('4. EQUIVALÊNCIAS', ML, y);
+      hline(y+2, GREEN, 0.4);
+      y += 7;
+
+      const arvores = Math.round(d.total / 21);
+      const voos    = Math.round(d.total / 90);
+      const banhos  = Math.round(d.total / 3.6);
+
+      const equivData = [
+        { label: 'Árvores necessárias para absorver em 1 ano',  val: arvores.toLocaleString('pt-BR') },
+        { label: 'Voos SP→RIO equivalentes',                    val: voos.toLocaleString('pt-BR')    },
+        { label: 'Meses de banho diário equivalentes',          val: banhos.toLocaleString('pt-BR')  },
+      ];
+
+      equivData.forEach((eq, i) => {
+        if (i % 2 === 0) { fill(BGGRAY); rect(ML, y, CW, 8); }
+        font(7, 'normal'); rgb(INK); txt(eq.label, ML+2, y+5.5);
+        font(7, 'bold');   rgb(GREEN); txt(eq.val, W-MR-2, y+5.5, { align: 'right' });
+        y += 8;
+      });
+      y += 6;
+
+      // ── SEÇÃO 5: PLANO DE AÇÃO (TOP 3 DICAS) ──
+      font(7, 'bold'); rgb(INK2);
+      txt('5. PLANO DE AÇÃO — TOP 3 REDUÇÕES', ML, y);
+      hline(y+2, GREEN, 0.4);
+      y += 8;
+
+      const catLabels = { t: 'Transporte', e: 'Energia', a: 'Alimentação', c: 'Consumo' };
+      const catVals   = [
+        { k:'t', v: d.emis.t }, { k:'e', v: d.emis.e },
+        { k:'a', v: d.emis.a }, { k:'c', v: d.emis.c },
+      ].sort((a,b) => b.v - a.v).slice(0,3);
+
+      const dicasMap = {
+        t: 'Substitua viagens de carro por transporte público, bicicleta ou caminhada. Considere carro elétrico ou híbrido.',
+        e: 'Instale painéis solares, troque lâmpadas por LED e reduza o consumo de gás de cozinha.',
+        a: 'Reduza o consumo de carne vermelha, priorize alimentos locais e diminua o desperdício alimentar.',
+        c: 'Compre menos itens novos, prefira brechós e eletrônicos recondicionados, use produtos até o fim.',
+      };
+
+      catVals.forEach((cat, i) => {
+        const saving20 = Math.round(cat.v * 0.20);
+        fill(i === 0 ? [245,252,242] : BGGRAY);
+        rect(ML, y, CW, 18);
+        if (i === 0) { fill(GREEN); rect(ML, y, 3, 18); }
+        font(7.5, 'bold'); rgb(i === 0 ? GREEN : INK2);
+        txt((i+1) + '. ' + catLabels[cat.k] + '  —  reduzir 20% = economia de ' + fmtN(saving20) + ' kg CO₂/ano', ML+6, y+6.5);
+        font(6.5, 'normal'); rgb(INK2);
+        const lines = doc.splitTextToSize(dicasMap[cat.k], CW-10);
+        txt(lines[0] || '', ML+6, y+13);
+        y += 20;
+      });
+
+      y += 3;
       addFooter();
 
       doc.save('carbonometro_pessoal.pdf');

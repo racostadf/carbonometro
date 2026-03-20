@@ -181,6 +181,28 @@
     }
     .leaf-1 { top: 10%; left: 5%;  width: 200px; transform: rotate(-20deg); }
     .leaf-2 { bottom: 15%; right: 3%; width: 280px; transform: rotate(30deg); }
+    .leaf-3 { top: 35%; right: 6%;  width: 140px; transform: rotate(-50deg); opacity: 0.03; }
+    .leaf-4 { top: 60%; right: 18%; width: 90px;  transform: rotate(18deg);  opacity: 0.03; }
+    .leaf-5 { top: 55%; left: 8%;  width: 85px;  transform: rotate(-65deg) scaleX(-1); opacity: 0.03; }
+
+    [data-theme="light"] .leaf   { opacity: 0.13; }
+    [data-theme="light"] .leaf-3 { opacity: 0.09; }
+    [data-theme="light"] .leaf-4 { opacity: 0.08; }
+    [data-theme="light"] .leaf-5 { opacity: 0.08; }
+
+    @media (min-width: 769px) {
+      [data-theme="light"] .hero-glow {
+        background:
+          radial-gradient(ellipse 75% 65% at 50% 50%, rgba(40,105,18,0.18) 0%, transparent 65%),
+          radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.14) 0%, transparent 55%),
+          radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.12)  0%, transparent 55%),
+          radial-gradient(ellipse 35% 40% at 75% 85%, rgba(25,80,10,0.10) 0%, transparent 50%);
+      }
+      [data-theme="light"] .leaf   { opacity: 0.16; }
+      [data-theme="light"] .leaf-3 { opacity: 0.11; }
+      [data-theme="light"] .leaf-4 { opacity: 0.10; }
+      [data-theme="light"] .leaf-5 { opacity: 0.10; }
+    }
 
     .hero-title {
       font-family: var(--display);
@@ -714,6 +736,17 @@
     <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
     <line x1="100" y1="180" x2="60" y2="140" stroke="#5da83c" stroke-width="0.8"/>
     <line x1="100" y1="200" x2="140" y2="160" stroke="#5da83c" stroke-width="0.8"/>
+  </svg>
+  <svg class="leaf leaf-3" viewBox="0 0 200 300" fill="none">
+    <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  </svg>
+  <svg class="leaf leaf-4" viewBox="0 0 200 300" fill="none">
+    <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+    <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+  </svg>
+  <svg class="leaf leaf-5" viewBox="0 0 200 300" fill="none">
+    <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+    <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
   </svg>
 
   <h1 class="hero-title">Sua <em>pegada</em> de<br>carbono, revelada</h1>

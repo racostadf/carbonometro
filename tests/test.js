@@ -188,11 +188,21 @@ async function getInputValue(page, id) {
     const meterAfterNumInput = await getMeter(page);
     tally(check(meterAfterNumInput !== meterBeforeNumInput, `Digitar n-luz=500 atualiza o gauge (${meterBeforeNumInput} → ${meterAfterNumInput})`));
 
-    // 12d. Valor acima do máximo é clampado (n-carro max=1000)
+    // 12d. Valor acima do máximo é clampado no slider E no input numérico
     await setInput(page, 'n-carro', 9999);
     await page.waitForTimeout(200);
     const sliderCarroClamped = await getInputValue(page, 's-carro');
-    tally(check(sliderCarroClamped <= 1000, `Valor fora do range clampado: s-carro=${sliderCarroClamped} (max=1000)`));
+    const numCarroClamped   = await getInputValue(page, 'n-carro');
+    tally(check(sliderCarroClamped <= 1000, `Valor acima do max clampado no slider: s-carro=${sliderCarroClamped} (max=1000)`));
+    tally(check(numCarroClamped <= 1000,    `Valor acima do max corrigido no input:  n-carro=${numCarroClamped} (max=1000)`));
+
+    // 12d2. Valor negativo é clampado para 0 no slider E no input numérico
+    await setInput(page, 'n-moto', -50);
+    await page.waitForTimeout(200);
+    const sliderMotoClamped = await getInputValue(page, 's-moto');
+    const numMotoClamped    = await getInputValue(page, 'n-moto');
+    tally(check(sliderMotoClamped >= 0, `Valor negativo clampado no slider: s-moto=${sliderMotoClamped} (min=0)`));
+    tally(check(numMotoClamped >= 0,    `Valor negativo corrigido no input:  n-moto=${numMotoClamped} (min=0)`));
 
     // 12e. Slider e input numérico produzem o mesmo resultado no gauge
     await setSlider(page, 's-luz', 200);
@@ -383,6 +393,22 @@ async function getInputValue(page, id) {
     await page.waitForTimeout(200);
     const meterAfterAterro = await getMeter(page);
     tally(check(meterAfterAterro !== meterBeforeAterro, `Digitar n-aterro=0 altera gauge (${meterBeforeAterro} → ${meterAfterAterro})`));
+
+    // 13f2. Valor acima do máximo clampado no slider E no input (n-irec max=100)
+    await setInput(page, 'n-irec', 999);
+    await page.waitForTimeout(200);
+    const sliderIrecClamped = await getInputValue(page, 's-irec');
+    const numIrecClamped    = await getInputValue(page, 'n-irec');
+    tally(check(sliderIrecClamped <= 100, `Valor acima do max clampado no slider: s-irec=${sliderIrecClamped} (max=100)`));
+    tally(check(numIrecClamped <= 100,    `Valor acima do max corrigido no input:  n-irec=${numIrecClamped} (max=100)`));
+
+    // 13f3. Valor negativo clampado para 0 (n-solar min=0)
+    await setInput(page, 'n-solar', -20);
+    await page.waitForTimeout(200);
+    const sliderSolarClamped = await getInputValue(page, 's-solar');
+    const numSolarClamped    = await getInputValue(page, 'n-solar');
+    tally(check(sliderSolarClamped >= 0, `Valor negativo clampado no slider: s-solar=${sliderSolarClamped} (min=0)`));
+    tally(check(numSolarClamped >= 0,    `Valor negativo corrigido no input:  n-solar=${numSolarClamped} (min=0)`));
 
     // 13f. Todos os inputs numéricos dos sliders existem no DOM
     const empNumIds = ['n-irec','n-solar','n-aterro','n-recicl','n-comp'];

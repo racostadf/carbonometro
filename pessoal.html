@@ -1205,8 +1205,11 @@
   }
   function syncN(nid, rid) {
     const r = document.getElementById(rid);
-    const raw = parseFloat(document.getElementById(nid).value) || 0;
-    r.value = Math.max(parseFloat(r.min) || 0, Math.min(parseFloat(r.max) || Infinity, raw));
+    const n = document.getElementById(nid);
+    const raw = parseFloat(n.value) || 0;
+    const clamped = Math.max(parseFloat(r.min) || 0, Math.min(parseFloat(r.max) || Infinity, raw));
+    r.value = clamped;
+    if (raw !== clamped) n.value = clamped;
   }
 
   function calc() {

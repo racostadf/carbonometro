@@ -260,6 +260,13 @@
       color: var(--text); border-color: var(--green);
       transform: translateY(-2px);
     }
+    .cta-amber {
+      color: var(--amber); border-color: rgba(200,136,46,0.4);
+    }
+    .cta-amber:hover {
+      color: var(--amber-light); border-color: var(--amber);
+      transform: translateY(-2px);
+    }
 
     .scroll-cue {
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
@@ -729,7 +736,6 @@
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
       <span id="themeIcon"></span>
     </button>
-    <a href="pessoal.html" class="nav-cta">Calcular agora</a>
   </nav>
 </header>
 
@@ -788,8 +794,8 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg>
       Calcular minha pegada
     </a>
-    <a href="#calculadoras" class="cta cta-secondary">
-      Ver as calculadoras
+    <a href="empresarial.html" class="cta cta-secondary cta-amber">
+      Minha Empresa
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
   </div>

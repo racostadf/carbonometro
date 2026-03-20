@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
+  <defs>
+    <style>
+      .logo-arc-track { stroke: #4a6840; stroke-opacity: 0.3; }
+      .logo-arc-fill  { stroke: #5da83c; }
+      .logo-leaf      { stroke: #7ec45e; }
+      .logo-name      { font-family: 'Fraunces', Georgia, serif; fill: #dce8d0; }
+      .logo-sub       { font-family: 'DM Mono', monospace; fill: #4a6840; }
+    </style>
+  </defs>
+
+  <!-- Icon: gauge arc + leaf — 80×80 -->
+  <!-- Track (240°, gap at bottom, rotate 150°) r=30, circ=188.5, 240°=125.7, gap=62.8 -->
+  <circle cx="40" cy="40" r="30"
+    class="logo-arc-track"
+    stroke-width="4.5" stroke-linecap="round"
+    stroke-dasharray="125.7 62.8"
+    transform="rotate(150 40 40)"/>
+
+  <!-- Fill arc (green, 240°) -->
+  <circle cx="40" cy="40" r="30"
+    class="logo-arc-fill"
+    stroke-width="4.5" stroke-linecap="round"
+    stroke-dasharray="125.7 62.8"
+    transform="rotate(150 40 40)"
+    style="filter:drop-shadow(0 0 6px #5da83c88)"/>
+
+  <!-- Leaf -->
+  <path d="M40 54 C30 47 28 32 40 22 C52 32 50 47 40 54Z"
+    class="logo-leaf" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Midrib -->
+  <line x1="40" y1="54" x2="40" y2="22"
+    class="logo-leaf" stroke-width="1" opacity="0.45"/>
+  <!-- Side veins -->
+  <path d="M40 46 Q35 42 33 37" class="logo-leaf" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+  <path d="M40 38 Q45 34 47 29" class="logo-leaf" stroke-width="0.9" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Wordmark -->
+  <text x="92" y="46" font-size="28" font-weight="400" letter-spacing="-0.5" class="logo-name">CarbonôMetro</text>
+  <text x="93" y="63" font-size="9" letter-spacing="3" class="logo-sub">BRASIL</text>
+</svg>

@@ -5,7 +5,7 @@
   <script>(function(){var t=localStorage.getItem('cmTheme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CarbonôMetro — Calcule Sua Pegada de Carbono</title>
+  <title>CarbonôMetro Brasil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,600;1,9..144,200;1,9..144,400&family=DM+Mono:wght@300;400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -95,6 +95,17 @@
       background: var(--header-bg);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
+    }
+    .header-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      pointer-events: none;
     }
     .theme-toggle {
       background: none; border: 1px solid var(--border-bright);
@@ -193,10 +204,10 @@
     @media (min-width: 769px) {
       [data-theme="light"] .hero-glow {
         background:
-          radial-gradient(ellipse 75% 65% at 50% 50%, rgba(40,105,18,0.18) 0%, transparent 65%),
-          radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.14) 0%, transparent 55%),
-          radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.12)  0%, transparent 55%),
-          radial-gradient(ellipse 35% 40% at 75% 85%, rgba(25,80,10,0.10) 0%, transparent 50%);
+          radial-gradient(ellipse 75% 65% at 50% 50%, rgba(40,105,18,0.253) 0%, transparent 65%),
+          radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.193) 0%, transparent 55%),
+          radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.165)  0%, transparent 55%),
+          radial-gradient(ellipse 35% 40% at 75% 85%, rgba(25,80,10,0.138) 0%, transparent 50%);
       }
       [data-theme="light"] .leaf   { opacity: 0.16; }
       [data-theme="light"] .leaf-3 { opacity: 0.11; }
@@ -467,6 +478,20 @@
       white-space: nowrap;
     }
 
+    .range-row { display: flex; align-items: center; gap: 0.5rem; }
+    .range-row input[type="range"] { flex: 1; }
+    .num-input {
+      width: 62px; flex-shrink: 0;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--green-light); font-family: var(--mono); font-size: 0.75rem;
+      padding: 0.22rem 0.4rem; border-radius: 4px; outline: none; text-align: right;
+      -moz-appearance: textfield;
+    }
+    .num-input::-webkit-outer-spin-button,
+    .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .num-input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(93,168,60,0.15); }
+    .num-unit { font-family: var(--mono); font-size: 0.68rem; color: var(--text-3); white-space: nowrap; flex-shrink: 0; }
+
     /* Range slider */
     input[type="range"] {
       -webkit-appearance: none;
@@ -657,6 +682,10 @@
     }
     .appear.in { opacity: 1; transform: translateY(0); }
 
+    @media (max-width: 769px) {
+      .header-center { display: none; }
+    }
+
     @media (max-width: 700px) {
       header { padding: 0.9rem 1.2rem; }
 
@@ -701,13 +730,14 @@
       <svg class="logo-icon" width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
         <circle cx="16" cy="16" r="12.5" stroke="currentColor" stroke-opacity="0.2" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
         <circle cx="16" cy="16" r="12.5" style="stroke:var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
-        <line x1="16" y1="17" x2="9.5" y2="11" style="stroke:var(--green-light)" stroke-width="2" stroke-linecap="round"/>
-        <line x1="16" y1="17" x2="19" y2="20" style="stroke:var(--green)" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-        <circle cx="16" cy="17" r="2.2" style="fill:var(--green)"/>
+        <path d="M16 23 C11.5 19.5 11 13 16 9 C21 13 20.5 19.5 16 23Z" style="stroke:var(--green-light)" fill="none" stroke-width="1.3" stroke-linejoin="round" transform="rotate(-45 16 16)"/>
+        <line x1="16" y1="23" x2="16" y2="9" style="stroke:var(--green-light)" stroke-width="0.8" opacity="0.4" transform="rotate(-45 16 16)"/>
+        <circle cx="16" cy="16" r="1.5" style="fill:var(--green)"/>
       </svg>
       CarbonôMetro <em>Brasil</em>
     </div>
   </div>
+  <span class="header-center">Você</span>
   <div style="display:flex;align-items:center;gap:1rem;">
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
       <span id="themeIcon"></span>
@@ -810,8 +840,12 @@
     <div class="fields">
       <div class="field-row">
         <div class="field">
-          <label>Km de carro por semana <span class="lv" id="v-carro">0 km</span></label>
-          <input type="range" id="s-carro" min="0" max="1000" value="0" step="10" oninput="calc()">
+          <label>Km de carro por semana</label>
+          <div class="range-row">
+            <input type="range" id="s-carro" min="0" max="1000" value="0" step="10" oninput="syncR('s-carro','n-carro');calc()">
+            <input type="number" class="num-input" id="n-carro" min="0" max="1000" step="10" value="0" oninput="syncN('n-carro','s-carro');calc()">
+            <span class="num-unit">km</span>
+          </div>
         </div>
         <div class="field">
           <label>Tipo de veículo</label>
@@ -826,17 +860,29 @@
       </div>
       <div class="field-row">
         <div class="field">
-          <label>Km de moto por semana <span class="lv" id="v-moto">0 km</span></label>
-          <input type="range" id="s-moto" min="0" max="500" value="0" step="5" oninput="calc()">
+          <label>Km de moto por semana</label>
+          <div class="range-row">
+            <input type="range" id="s-moto" min="0" max="500" value="0" step="5" oninput="syncR('s-moto','n-moto');calc()">
+            <input type="number" class="num-input" id="n-moto" min="0" max="500" step="5" value="0" oninput="syncN('n-moto','s-moto');calc()">
+            <span class="num-unit">km</span>
+          </div>
         </div>
         <div class="field">
-          <label>Horas de voo por ano <span class="lv" id="v-aviao">0 h</span></label>
-          <input type="range" id="s-aviao" min="0" max="200" value="0" step="1" oninput="calc()">
+          <label>Horas de voo por ano</label>
+          <div class="range-row">
+            <input type="range" id="s-aviao" min="0" max="200" value="0" step="1" oninput="syncR('s-aviao','n-aviao');calc()">
+            <input type="number" class="num-input" id="n-aviao" min="0" max="200" step="1" value="0" oninput="syncN('n-aviao','s-aviao');calc()">
+            <span class="num-unit">h</span>
+          </div>
         </div>
       </div>
       <div class="field">
-        <label>Km de ônibus / metrô / trem por semana <span class="lv" id="v-onibus">0 km</span></label>
-        <input type="range" id="s-onibus" min="0" max="500" value="0" step="5" oninput="calc()">
+        <label>Km de ônibus / metrô / trem por semana</label>
+        <div class="range-row">
+          <input type="range" id="s-onibus" min="0" max="500" value="0" step="5" oninput="syncR('s-onibus','n-onibus');calc()">
+          <input type="number" class="num-input" id="n-onibus" min="0" max="500" step="5" value="0" oninput="syncN('n-onibus','s-onibus');calc()">
+          <span class="num-unit">km</span>
+        </div>
       </div>
     </div>
   </div>
@@ -859,12 +905,20 @@
     <div class="fields">
       <div class="field-row">
         <div class="field">
-          <label>Consumo mensal de luz (kWh) <span class="lv" id="v-luz">0 kWh</span></label>
-          <input type="range" id="s-luz" min="0" max="1000" value="0" step="10" oninput="calc()">
+          <label>Consumo mensal de luz (kWh)</label>
+          <div class="range-row">
+            <input type="range" id="s-luz" min="0" max="1000" value="0" step="10" oninput="syncR('s-luz','n-luz');calc()">
+            <input type="number" class="num-input" id="n-luz" min="0" max="1000" step="10" value="0" oninput="syncN('n-luz','s-luz');calc()">
+            <span class="num-unit">kWh</span>
+          </div>
         </div>
         <div class="field">
-          <label>Gás de cozinha por mês (kg) <span class="lv" id="v-gas">0 kg</span></label>
-          <input type="range" id="s-gas" min="0" max="25" value="0" step="0.5" oninput="calc()">
+          <label>Gás de cozinha por mês (kg)</label>
+          <div class="range-row">
+            <input type="range" id="s-gas" min="0" max="25" value="0" step="0.5" oninput="syncR('s-gas','n-gas');calc()">
+            <input type="number" class="num-input" id="n-gas" min="0" max="25" step="0.5" value="0" oninput="syncN('n-gas','s-gas');calc()">
+            <span class="num-unit">kg</span>
+          </div>
         </div>
       </div>
       <div class="field-row">
@@ -920,8 +974,12 @@
       </div>
       <div class="field-row">
         <div class="field">
-          <label>Alimentos locais / orgânicos <span class="lv" id="v-local">0%</span></label>
-          <input type="range" id="s-local" min="0" max="100" value="0" step="5" oninput="calc()">
+          <label>Alimentos locais / orgânicos</label>
+          <div class="range-row">
+            <input type="range" id="s-local" min="0" max="100" value="0" step="5" oninput="syncR('s-local','n-local');calc()">
+            <input type="number" class="num-input" id="n-local" min="0" max="100" step="5" value="0" oninput="syncN('n-local','s-local');calc()">
+            <span class="num-unit">%</span>
+          </div>
         </div>
         <div class="field">
           <label>Desperdício alimentar <span class="lv" id="v-desp">médio</span></label>
@@ -951,12 +1009,20 @@
     <div class="fields">
       <div class="field-row">
         <div class="field">
-          <label>Roupas novas por ano <span class="lv" id="v-roupas">0 peças</span></label>
-          <input type="range" id="s-roupas" min="0" max="100" value="0" step="1" oninput="calc()">
+          <label>Roupas novas por ano</label>
+          <div class="range-row">
+            <input type="range" id="s-roupas" min="0" max="100" value="0" step="1" oninput="syncR('s-roupas','n-roupas');calc()">
+            <input type="number" class="num-input" id="n-roupas" min="0" max="100" step="1" value="0" oninput="syncN('n-roupas','s-roupas');calc()">
+            <span class="num-unit">peças</span>
+          </div>
         </div>
         <div class="field">
-          <label>Eletrônicos novos por ano <span class="lv" id="v-eletro">0 itens</span></label>
-          <input type="range" id="s-eletro" min="0" max="10" value="0" step="1" oninput="calc()">
+          <label>Eletrônicos novos por ano</label>
+          <div class="range-row">
+            <input type="range" id="s-eletro" min="0" max="10" value="0" step="1" oninput="syncR('s-eletro','n-eletro');calc()">
+            <input type="number" class="num-input" id="n-eletro" min="0" max="10" step="1" value="0" oninput="syncN('n-eletro','s-eletro');calc()">
+            <span class="num-unit">itens</span>
+          </div>
         </div>
       </div>
       <div class="field-row">
@@ -1134,17 +1200,21 @@
   function set(id, txt) { document.getElementById(id).textContent = txt; }
   function fmt(n) { return Math.round(n).toLocaleString('pt-BR'); }
 
+  function syncR(rid, nid) {
+    document.getElementById(nid).value = document.getElementById(rid).value;
+  }
+  function syncN(nid, rid) {
+    const r = document.getElementById(rid);
+    const raw = parseFloat(document.getElementById(nid).value) || 0;
+    r.value = Math.max(parseFloat(r.min) || 0, Math.min(parseFloat(r.max) || Infinity, raw));
+  }
+
   function calc() {
-    // ── Label updates ──
-    set('v-carro',  v('s-carro')  + ' km');
-    set('v-moto',   v('s-moto')   + ' km');
-    set('v-aviao',  v('s-aviao')  + ' h');
-    set('v-onibus', v('s-onibus') + ' km');
-    set('v-luz',    v('s-luz')    + ' kWh');
-    set('v-gas',    v('s-gas')    + ' kg');
-    set('v-roupas', v('s-roupas') + ' peças');
-    set('v-eletro', v('s-eletro') + ' itens');
-    set('v-local',  v('s-local')  + '%');
+    // ── Sync number inputs from sliders ──
+    ['carro','moto','aviao','onibus','luz','gas','local','roupas','eletro'].forEach(k => {
+      const el = document.getElementById('n-' + k);
+      if (el) el.value = v('s-' + k);
+    });
     const dv = v('s-desp');
     set('v-desp', dv <= 0.85 ? 'muito baixo' : dv <= 1.05 ? 'médio' : dv <= 1.2 ? 'alto' : 'muito alto');
 

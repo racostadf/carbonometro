@@ -5,7 +5,7 @@
   <script>(function(){var t=localStorage.getItem('cmTheme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CarbonôMetro Empresarial — Inventário GHG</title>
+  <title>CarbonôMetro Brasil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,600;1,9..144,200;1,9..144,400&family=DM+Mono:wght@300;400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -26,6 +26,8 @@
       --green-pale:  #b8d8a0;
       --amber:       #c8882e;
       --amber-light: #dba84e;
+      --ember:       #e04d20;
+      --ember-light: #f06c40;
       --blue:        #6b9ac4;
       --red:         #b85030;
       --red-light:   #d4724e;
@@ -52,6 +54,8 @@
       --green-pale:  #1c5010;
       --amber:       #9a5c08;
       --amber-light: #c07818;
+      --ember:       #b82f10;
+      --ember-light: #d44a28;
       --blue:        #28599a;
       --red:         #8c1e08;
       --red-light:   #b83218;
@@ -89,6 +93,17 @@
       background: var(--header-bg);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
+    }
+    .header-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      pointer-events: none;
     }
     .theme-toggle {
       background: none; border: 1px solid var(--border-bright);
@@ -176,10 +191,10 @@
     @media (min-width: 769px) {
       [data-theme="light"] .hero-glow {
         background:
-          radial-gradient(ellipse 75% 65% at 50% 50%, rgba(40,105,18,0.18) 0%, transparent 65%),
-          radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.14) 0%, transparent 55%),
-          radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.12)  0%, transparent 55%),
-          radial-gradient(ellipse 35% 40% at 75% 85%, rgba(25,80,10,0.10) 0%, transparent 50%);
+          radial-gradient(ellipse 75% 65% at 50% 50%, rgba(40,105,18,0.253) 0%, transparent 65%),
+          radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.193) 0%, transparent 55%),
+          radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.165)  0%, transparent 55%),
+          radial-gradient(ellipse 35% 40% at 75% 85%, rgba(25,80,10,0.138) 0%, transparent 50%);
       }
       [data-theme="light"] .leaf   { opacity: 0.16; }
       [data-theme="light"] .leaf-3 { opacity: 0.11; }
@@ -223,9 +238,9 @@
     .meter-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
     .meter-track { fill: none; stroke: var(--surface-3); stroke-width: 7; }
     .meter-fill {
-      fill: none; stroke: var(--green); stroke-width: 7; stroke-linecap: round;
+      fill: none; stroke: var(--ember); stroke-width: 7; stroke-linecap: round;
       transition: stroke-dashoffset 0.9s cubic-bezier(0.34, 1.4, 0.64, 1), stroke 0.5s ease;
-      filter: drop-shadow(0 0 10px currentColor);
+      filter: drop-shadow(0 0 14px currentColor) drop-shadow(0 0 6px currentColor);
     }
     .meter-center {
       position: absolute; inset: 0;
@@ -369,6 +384,19 @@
       display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
     }
     .lv { font-family: var(--mono); font-size: 0.72rem; color: var(--text); }
+    .range-row { display: flex; align-items: center; gap: 0.5rem; }
+    .range-row input[type="range"] { flex: 1; }
+    .num-input {
+      width: 58px; flex-shrink: 0;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--green-light); font-family: var(--mono); font-size: 0.72rem;
+      padding: 0.22rem 0.4rem; border-radius: 4px; outline: none; text-align: right;
+      -moz-appearance: textfield;
+    }
+    .num-input::-webkit-outer-spin-button,
+    .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .num-input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(93,168,60,0.15); }
+    .num-unit { font-family: var(--mono); font-size: 0.68rem; color: var(--text-3); white-space: nowrap; flex-shrink: 0; }
 
     /* Number input */
     .input-wrap {
@@ -515,6 +543,10 @@
     .appear.in { opacity: 1; transform: translateY(0); }
 
     /* ─── RESPONSIVO ─── */
+    @media (max-width: 769px) {
+      .header-center { display: none; }
+    }
+
     @media (max-width: 700px) {
       header { padding: 0.9rem 1.2rem; }
 
@@ -572,15 +604,16 @@
       <svg class="logo-icon" width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
         <circle cx="16" cy="16" r="12.5" stroke="currentColor" stroke-opacity="0.2" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
         <circle cx="16" cy="16" r="12.5" style="stroke:var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
-        <line x1="16" y1="17" x2="9.5" y2="11" style="stroke:var(--green-light)" stroke-width="2" stroke-linecap="round"/>
-        <line x1="16" y1="17" x2="19" y2="20" style="stroke:var(--green)" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-        <circle cx="16" cy="17" r="2.2" style="fill:var(--green)"/>
+        <path d="M16 23 C11.5 19.5 11 13 16 9 C21 13 20.5 19.5 16 23Z" style="stroke:var(--green-light)" fill="none" stroke-width="1.3" stroke-linejoin="round" transform="rotate(-45 16 16)"/>
+        <line x1="16" y1="23" x2="16" y2="9" style="stroke:var(--green-light)" stroke-width="0.8" opacity="0.4" transform="rotate(-45 16 16)"/>
+        <circle cx="16" cy="16" r="1.5" style="fill:var(--green)"/>
       </svg>
-      CarbonôMetro <em>Empresarial</em>
+      CarbonôMetro <em>Brasil</em>
     </div>
   </div>
+  <span class="header-center">Sua Empresa</span>
   <div class="header-right">
-    <span class="header-empresa" id="h-empresa">—</span>
+    <span class="header-empresa" id="h-empresa"></span>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
       <span id="themeIcon"></span>
     </button>
@@ -829,12 +862,20 @@
         <hr class="divider">
         <div class="field-grid fg-2">
           <div class="field">
-            <label>Certificados I-REC / Renováveis <span class="lv" id="v-irec">0%</span></label>
-            <input type="range" id="s-irec" min="0" max="100" value="0" step="5" oninput="calc()">
+            <label>Certificados I-REC / Renováveis</label>
+            <div class="range-row">
+              <input type="range" id="s-irec" min="0" max="100" value="0" step="5" oninput="syncR('s-irec','n-irec');calc()">
+              <input type="number" class="num-input" id="n-irec" min="0" max="100" step="5" value="0" oninput="syncN('n-irec','s-irec');calc()">
+              <span class="num-unit">%</span>
+            </div>
           </div>
           <div class="field">
-            <label>Energia solar própria (% demanda) <span class="lv" id="v-solar">0%</span></label>
-            <input type="range" id="s-solar" min="0" max="100" value="0" step="5" oninput="calc()">
+            <label>Energia solar própria (% demanda)</label>
+            <div class="range-row">
+              <input type="range" id="s-solar" min="0" max="100" value="0" step="5" oninput="syncR('s-solar','n-solar');calc()">
+              <input type="number" class="num-input" id="n-solar" min="0" max="100" step="5" value="0" oninput="syncN('n-solar','s-solar');calc()">
+              <span class="num-unit">%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -930,16 +971,28 @@
         </div>
         <div class="field-grid fg-3">
           <div class="field">
-            <label>% aterro sanitário <span class="lv" id="v-aterro">60%</span></label>
-            <input type="range" id="s-aterro" min="0" max="100" value="60" step="5" oninput="calc()">
+            <label>% aterro sanitário</label>
+            <div class="range-row">
+              <input type="range" id="s-aterro" min="0" max="100" value="60" step="5" oninput="syncR('s-aterro','n-aterro');calc()">
+              <input type="number" class="num-input" id="n-aterro" min="0" max="100" step="5" value="60" oninput="syncN('n-aterro','s-aterro');calc()">
+              <span class="num-unit">%</span>
+            </div>
           </div>
           <div class="field">
-            <label>% reciclagem <span class="lv" id="v-recicl">30%</span></label>
-            <input type="range" id="s-recicl" min="0" max="100" value="30" step="5" oninput="calc()">
+            <label>% reciclagem</label>
+            <div class="range-row">
+              <input type="range" id="s-recicl" min="0" max="100" value="30" step="5" oninput="syncR('s-recicl','n-recicl');calc()">
+              <input type="number" class="num-input" id="n-recicl" min="0" max="100" step="5" value="30" oninput="syncN('n-recicl','s-recicl');calc()">
+              <span class="num-unit">%</span>
+            </div>
           </div>
           <div class="field">
-            <label>% compostagem <span class="lv" id="v-comp">10%</span></label>
-            <input type="range" id="s-comp" min="0" max="100" value="10" step="5" oninput="calc()">
+            <label>% compostagem</label>
+            <div class="range-row">
+              <input type="range" id="s-comp" min="0" max="100" value="10" step="5" oninput="syncR('s-comp','n-comp');calc()">
+              <input type="number" class="num-input" id="n-comp" min="0" max="100" step="5" value="10" oninput="syncN('n-comp','s-comp');calc()">
+              <span class="num-unit">%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1083,13 +1136,21 @@ function updateEmpresa() {
   $('h-empresa').textContent = v || '—';
 }
 
+function syncR(rid, nid) {
+  $(nid).value = $(rid).value;
+}
+function syncN(nid, rid) {
+  const r = $(rid);
+  const raw = parseFloat($(nid).value) || 0;
+  r.value = Math.max(parseFloat(r.min) || 0, Math.min(parseFloat(r.max) || Infinity, raw));
+}
+
 function calc() {
-  /* label sync */
-  set('v-irec',   vf('s-irec')   + '%');
-  set('v-solar',  vf('s-solar')  + '%');
-  set('v-aterro', vf('s-aterro') + '%');
-  set('v-recicl', vf('s-recicl') + '%');
-  set('v-comp',   vf('s-comp')   + '%');
+  /* sync number inputs from sliders */
+  ['irec','solar','aterro','recicl','comp'].forEach(k => {
+    const el = $('n-' + k);
+    if (el) el.value = vf('s-' + k);
+  });
 
   /* slider tracks */
   ['s-irec','s-solar','s-aterro','s-recicl','s-comp'].forEach(id => {
@@ -1147,11 +1208,11 @@ function render(nFunc) {
   $('meterFill').style.strokeDashoffset = circ * (1 - pct);
 
   let color, statusTxt;
-  if (totalT === 0)       { color = 'var(--text-3)'; statusTxt = 'Preencha abaixo'; }
-  else if (intensity < 2) { color = 'var(--green)';  statusTxt = 'Intensidade exemplar'; }
-  else if (intensity < 5) { color = 'var(--green-light)'; statusTxt = 'Abaixo do benchmark'; }
-  else if (intensity < 10){ color = 'var(--amber)';  statusTxt = 'Acima do benchmark'; }
-  else                    { color = 'var(--red-light)'; statusTxt = 'Alto impacto — urgente'; }
+  if (totalT === 0)       { color = 'var(--text-3)';     statusTxt = 'Preencha abaixo'; }
+  else if (intensity < 2) { color = 'var(--ember-light)'; statusTxt = 'Intensidade exemplar'; }
+  else if (intensity < 5) { color = 'var(--ember)';       statusTxt = 'Abaixo do benchmark'; }
+  else if (intensity < 10){ color = 'var(--red-light)';   statusTxt = 'Acima do benchmark'; }
+  else                    { color = 'var(--red)';          statusTxt = 'Alto impacto — urgente'; }
 
   $('meterFill').style.stroke = color;
   $('meterKg').textContent = totalT.toFixed(1).replace('.', ',');

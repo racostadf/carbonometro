@@ -51,6 +51,13 @@ async function getText(page, id) {
   }, id);
 }
 
+async function getInputValue(page, id) {
+  return page.evaluate(id => {
+    const el = document.getElementById(id);
+    return el ? parseFloat(el.value) : null;
+  }, id);
+}
+
 // ─────────────────────────────────────────────────────────
 (async () => {
   const browser = await chromium.launch();
@@ -158,6 +165,48 @@ async function getText(page, id) {
     // ── 11. Erros JS ──
     console.log('\n  [11] Erros de JavaScript');
     tally(check(jsErrors.length === 0, jsErrors.length ? 'Erros: ' + jsErrors.join(' | ') : 'Sem erros JS'));
+
+    // ── 12. Sync input numérico ↔ slider ──
+    console.log('\n  [12] Sync input numérico ↔ slider (pessoal)');
+
+    // 12a. Digitar no input numérico atualiza o slider
+    await setInput(page, 'n-carro', 400);
+    await page.waitForTimeout(200);
+    const sliderCarroAfterNum = await getInputValue(page, 's-carro');
+    tally(check(sliderCarroAfterNum === 400, `Digitar n-carro=400 → slider s-carro=${sliderCarroAfterNum}`));
+
+    // 12b. Mover o slider atualiza o input numérico
+    await setSlider(page, 's-moto', 150);
+    await page.waitForTimeout(200);
+    const numMotoAfterSlider = await getInputValue(page, 'n-moto');
+    tally(check(numMotoAfterSlider === 150, `Mover s-moto=150 → n-moto=${numMotoAfterSlider}`));
+
+    // 12c. Digitar no input numérico atualiza o gauge
+    const meterBeforeNumInput = await getMeter(page);
+    await setInput(page, 'n-luz', 500);
+    await page.waitForTimeout(200);
+    const meterAfterNumInput = await getMeter(page);
+    tally(check(meterAfterNumInput !== meterBeforeNumInput, `Digitar n-luz=500 atualiza o gauge (${meterBeforeNumInput} → ${meterAfterNumInput})`));
+
+    // 12d. Valor acima do máximo é clampado (n-carro max=1000)
+    await setInput(page, 'n-carro', 9999);
+    await page.waitForTimeout(200);
+    const sliderCarroClamped = await getInputValue(page, 's-carro');
+    tally(check(sliderCarroClamped <= 1000, `Valor fora do range clampado: s-carro=${sliderCarroClamped} (max=1000)`));
+
+    // 12e. Slider e input numérico produzem o mesmo resultado no gauge
+    await setSlider(page, 's-luz', 200);
+    await page.waitForTimeout(200);
+    const meterViaSlider = await getMeter(page);
+    await setInput(page, 'n-luz', 200);
+    await page.waitForTimeout(200);
+    const meterViaNumInput = await getMeter(page);
+    tally(check(meterViaSlider === meterViaNumInput, `Gauge idêntico via slider (${meterViaSlider}) e via input numérico (${meterViaNumInput})`));
+
+    // 12f. Todos os inputs numéricos existem no DOM
+    const numInputIds = ['n-carro','n-moto','n-aviao','n-onibus','n-luz','n-gas','n-local','n-roupas','n-eletro'];
+    const allExist = await page.evaluate(ids => ids.every(id => !!document.getElementById(id)), numInputIds);
+    tally(check(allExist, 'Todos os 9 inputs numéricos existem no DOM'));
 
     // screenshots
     await page.screenshot({ path: path.join(screenshotsDir, 'pessoal-filled.png') });
@@ -291,6 +340,54 @@ async function getText(page, id) {
     // ── 12. Erros JS ──
     console.log('\n  [12] Erros de JavaScript');
     tally(check(jsErrors.length === 0, jsErrors.length ? 'Erros: ' + jsErrors.join(' | ') : 'Sem erros JS'));
+
+    // ── 13. Sync input numérico ↔ slider (empresarial) ──
+    console.log('\n  [13] Sync input numérico ↔ slider (empresarial)');
+
+    // 13a. Digitar em n-irec atualiza slider s-irec
+    await setInput(page, 'n-irec', 60);
+    await page.waitForTimeout(200);
+    const sliderIrecAfterNum = await getInputValue(page, 's-irec');
+    tally(check(sliderIrecAfterNum === 60, `Digitar n-irec=60 → slider s-irec=${sliderIrecAfterNum}`));
+
+    // 13b. Mover slider s-solar atualiza n-solar
+    await setSlider(page, 's-solar', 40);
+    await page.waitForTimeout(200);
+    const numSolarAfterSlider = await getInputValue(page, 'n-solar');
+    tally(check(numSolarAfterSlider === 40, `Mover s-solar=40 → n-solar=${numSolarAfterSlider}`));
+
+    // 13c. n-irec=100 reduz Escopo 2 ao máximo (abatimento total)
+    await setInput(page, 'eletric', 5000);
+    await setSelect(page, 'regiao', '0.082');
+    // reset abatimento antes de medir baseline
+    await setInput(page, 'n-irec', 0);
+    await setInput(page, 'n-solar', 0);
+    await page.waitForTimeout(200);
+    const s2WithoutAbate = parseFloat((await getText(page, 'r-s2') || '0').replace(',', '.'));
+    await setInput(page, 'n-irec', 100);
+    await page.waitForTimeout(200);
+    const s2FullAbate = parseFloat((await getText(page, 'r-s2') || '0').replace(',', '.'));
+    tally(check(s2FullAbate < s2WithoutAbate, `n-irec=100% abate Escopo 2: ${s2WithoutAbate} → ${s2FullAbate} tCO₂e`));
+
+    // 13d. Mover slider s-aterro atualiza n-aterro
+    await setSlider(page, 's-aterro', 80);
+    await page.waitForTimeout(200);
+    const numAterroAfterSlider = await getInputValue(page, 'n-aterro');
+    tally(check(numAterroAfterSlider === 80, `Mover s-aterro=80 → n-aterro=${numAterroAfterSlider}`));
+
+    // 13e. Digitar em n-aterro atualiza o gauge
+    await setInput(page, 'res-total', 1000);
+    await page.waitForTimeout(200);
+    const meterBeforeAterro = await getMeter(page);
+    await setInput(page, 'n-aterro', 0);
+    await page.waitForTimeout(200);
+    const meterAfterAterro = await getMeter(page);
+    tally(check(meterAfterAterro !== meterBeforeAterro, `Digitar n-aterro=0 altera gauge (${meterBeforeAterro} → ${meterAfterAterro})`));
+
+    // 13f. Todos os inputs numéricos dos sliders existem no DOM
+    const empNumIds = ['n-irec','n-solar','n-aterro','n-recicl','n-comp'];
+    const allEmpExist = await page.evaluate(ids => ids.every(id => !!document.getElementById(id)), empNumIds);
+    tally(check(allEmpExist, 'Todos os 5 inputs numéricos de sliders existem no DOM'));
 
     await page.screenshot({ path: path.join(screenshotsDir, 'empresarial-filled.png') });
     info('Screenshot: tests/screenshots/empresarial-filled.png');

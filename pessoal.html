@@ -259,6 +259,7 @@
       stroke: var(--surface-3);
       stroke-width: 7;
     }
+    [data-theme="light"] .meter-track { stroke: rgba(40, 105, 18, 0.22); }
 
     .meter-fill {
       fill: none;
@@ -1312,6 +1313,14 @@
     updateIcon();
   }
   updateIcon();
+
+  // ── Esconde overlay ao voltar pelo bfcache ──
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      const overlay = document.getElementById('calcOverlay');
+      overlay.style.display = 'none';
+    }
+  });
 </script>
 </body>
 </html>

@@ -103,6 +103,19 @@
     }
     .theme-toggle:hover { color: var(--green-light); border-color: var(--green-light); }
     .theme-toggle span { display: flex; line-height: 0; }
+    .live-badge {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-family: var(--mono); font-size: 0.6rem;
+      color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); animation: blink 2.2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.3; transform: scale(0.6); }
+    }
     .back-link {
       font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
       color: var(--text-3); text-decoration: none; text-transform: uppercase;
@@ -163,13 +176,66 @@
 
     /* ─── HERO SECTION ─── */
     .res-hero {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 2rem 0 3rem; text-align: center;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 3rem;
+      padding: 3rem 0 3.5rem;
     }
+    @media (max-width: 768px) {
+      .res-hero {
+        grid-template-columns: 1fr;
+        padding: 2rem 0 2.5rem;
+        justify-items: center;
+      }
+    }
+    .hero-col-gauge { display: flex; flex-direction: column; align-items: center; }
+    .hero-col-info  {
+      display: flex; flex-direction: column;
+      gap: 1.5rem; justify-content: center;
+    }
+    .hero-headline {
+      font-family: var(--display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+    }
+    .hero-headline em { font-style: italic; font-weight: 200; color: var(--green-light); }
+    .hero-status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      border: 1px solid;
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 0.95rem;
+      width: fit-content;
+      transition: all 0.5s;
+    }
+    .hero-cats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .hero-cat-item { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hero-cat-label {
+      font-family: var(--mono); font-size: 0.58rem;
+      letter-spacing: 0.1em; color: var(--text-3);
+      text-transform: uppercase;
+    }
+    .hero-cat-val {
+      font-family: var(--mono); font-size: 1.1rem;
+      font-weight: 400; line-height: 1;
+    }
+    .hero-cat-pct {
+      font-family: var(--mono); font-size: 0.62rem; color: var(--text-3);
+    }
+    .hero-cat-bar-wrap { height: 3px; background: var(--surface-3); border-radius: 2px; overflow: hidden; margin-top: 0.2rem; }
+    .hero-cat-bar { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.34,1.4,0.64,1); width: 0%; }
     .meter-wrap {
       position: relative;
       width: min(290px, 80vw); height: min(290px, 80vw);
-      margin-bottom: 1.5rem;
       animation: riseUp 0.9s 0.2s ease both;
     }
     @keyframes riseUp {
@@ -178,6 +244,7 @@
     }
     .meter-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
     .meter-track { fill: none; stroke: var(--surface-3); stroke-width: 7; }
+    [data-theme="light"] .meter-track { stroke: rgba(40, 105, 18, 0.22); }
     .meter-fill {
       fill: none; stroke: var(--green); stroke-width: 7;
       stroke-linecap: round;
@@ -212,15 +279,6 @@
     .bm-br    { color: var(--amber); }
     .bm-world { color: var(--blue); }
 
-    .res-title {
-      font-family: var(--display);
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 400;
-      line-height: 1.1;
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-    .res-title em { font-style: italic; font-weight: 200; color: var(--green-light); }
 
     /* ─── INSIGHTS GRID ─── */
     .insights-grid {
@@ -483,7 +541,8 @@
       .page-wrap { padding: 5rem 1rem 3rem; }
       .meter-wrap { width: min(260px, 78vw); height: min(260px, 78vw); }
       .meter-kg { font-size: 2rem; }
-      .res-title { font-size: 1.5rem; }
+      .hero-headline { font-size: 1.7rem; }
+      .hero-col-info { gap: 1rem; }
     }
   </style>
 </head>
@@ -535,10 +594,16 @@
       CarbonôMetro <em>Brasil</em>
     </div>
   </div>
-  <span class="header-center">Resultado</span>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
-    <span id="themeIcon"></span>
-  </button>
+  <span class="header-center">Você · Resultado</span>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
+      <span id="themeIcon"></span>
+    </button>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Tempo real
+    </div>
+  </div>
 </header>
 
 <!-- ═══ MAIN ═══ -->
@@ -546,7 +611,8 @@
 
   <!-- Hero -->
   <div class="res-hero">
-    <div style="position:relative;">
+    <!-- Coluna esquerda: gauge -->
+    <div class="hero-col-gauge">
       <div class="meter-wrap">
         <svg class="meter-svg" viewBox="0 0 290 290">
           <circle class="meter-track" cx="145" cy="145" r="118"/>
@@ -565,7 +631,37 @@
       </div>
     </div>
 
-    <h1 class="res-title" id="resTitle">Sua <em>pegada</em> calculada</h1>
+    <!-- Coluna direita: informações -->
+    <div class="hero-col-info">
+      <h1 class="hero-headline">Sua <em>pegada</em> calculada</h1>
+      <div id="heroStatusPill" class="hero-status-pill">—</div>
+      <div class="hero-cats">
+        <div class="hero-cat-item" id="heroT">
+          <div class="hero-cat-label">TRANSPORTE</div>
+          <div class="hero-cat-val">— kg</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--green)"></div></div>
+        </div>
+        <div class="hero-cat-item" id="heroE">
+          <div class="hero-cat-label">ENERGIA</div>
+          <div class="hero-cat-val">— kg</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--amber)"></div></div>
+        </div>
+        <div class="hero-cat-item" id="heroA">
+          <div class="hero-cat-label">ALIMENTAÇÃO</div>
+          <div class="hero-cat-val">— kg</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--blue)"></div></div>
+        </div>
+        <div class="hero-cat-item" id="heroC">
+          <div class="hero-cat-label">CONSUMO</div>
+          <div class="hero-cat-val">— kg</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--red-light)"></div></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Status Message -->
@@ -821,8 +917,29 @@
 
     document.getElementById('resMeterStatus').textContent = d.statusTxt;
 
-    document.getElementById('resTitle').innerHTML =
-      '<em>' + d.totalT.toFixed(1).replace('.', ',') + ' t CO₂</em> / ano';
+    // pill de status no painel direito
+    const pill = document.getElementById('heroStatusPill');
+    pill.textContent = d.statusTxt;
+    pill.style.background   = d.color + '22';
+    pill.style.borderColor  = d.color + '55';
+    pill.style.color        = d.color;
+
+    // 4 categorias no painel direito
+    const fmt = (n) => Math.round(n).toLocaleString('pt-BR');
+    const catData = [
+      { id: 'heroT', val: d.emis.t, pct: d.pct.t, color: 'var(--green)'     },
+      { id: 'heroE', val: d.emis.e, pct: d.pct.e, color: 'var(--amber)'     },
+      { id: 'heroA', val: d.emis.a, pct: d.pct.a, color: 'var(--blue)'      },
+      { id: 'heroC', val: d.emis.c, pct: d.pct.c, color: 'var(--red-light)' },
+    ];
+    catData.forEach(c => {
+      const el = document.getElementById(c.id);
+      el.querySelector('.hero-cat-val').textContent = fmt(c.val) + ' kg';
+      el.querySelector('.hero-cat-pct').textContent = c.pct + '%';
+      const bar = el.querySelector('.hero-cat-bar');
+      bar.style.width = c.pct + '%';
+      bar.style.background = c.color;
+    });
   }
 
   // ─── Status Message ──────────────────────────────────────
@@ -1222,6 +1339,9 @@
   updateIcon();
 
   // ─── Init ────────────────────────────────────────────────
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
   (function() {
     const d = loadResult();
     if (!d) {

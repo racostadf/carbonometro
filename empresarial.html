@@ -171,6 +171,11 @@
       margin-bottom: 0.6rem;
       animation: riseUp 0.9s ease both;
     }
+    @media (max-width: 700px) {
+      .hero-eyebrow { position: absolute; top: 4.2rem; left: 1.2rem; right: 1.2rem;
+        font-size: 0.52rem; margin-bottom: 0; white-space: nowrap;
+        overflow: hidden; text-overflow: ellipsis; }
+    }
 
     .hero-title {
       font-family: var(--display);
@@ -221,7 +226,9 @@
     .scroll-cue {
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
       margin-top: 3.5rem; animation: riseUp 0.9s 0.5s ease both; color: var(--text-3);
+      text-decoration: none; transition: color 0.2s;
     }
+    .scroll-cue:hover { color: var(--green-light); }
     .scroll-cue span { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; }
     .arrow { width: 18px; height: 18px; border-right: 1px solid var(--text-3); border-bottom: 1px solid var(--text-3); transform: rotate(45deg); animation: bob 2s ease infinite; }
 
@@ -600,14 +607,14 @@
     </div>
   </div>
 
-  <div class="scroll-cue" style="margin-top:4.5rem;">
+  <a href="#calculadora" class="scroll-cue" style="margin-top:4.5rem;">
     <span>Preencha os dados</span>
     <div class="arrow"></div>
-  </div>
+  </a>
 </section>
 
 <!-- ═══ CALCULATOR ═══ -->
-<main class="calc-wrap">
+<main id="calculadora" class="calc-wrap">
 
   <div class="section-head appear">
     <h2>Dados da organização</h2>

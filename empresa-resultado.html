@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <script>(function(){var t=localStorage.getItem('cmTheme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empresa · Resultado — CarbonôMetro Brasil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,600;1,9..144,200;1,9..144,400&family=DM+Mono:wght@300;400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080f08;
+      --bg-2:      #0d1a0d;
+      --surface:   #122012;
+      --surface-2: #192d19;
+      --surface-3: #203920;
+      --border:        rgba(90, 155, 60, 0.12);
+      --border-bright: rgba(90, 155, 60, 0.28);
+      --green:       #5da83c;
+      --green-light: #7ec45e;
+      --green-pale:  #b8d8a0;
+      --amber:       #c8882e;
+      --amber-light: #dba84e;
+      --ember:       #e04d20;
+      --ember-light: #f06c40;
+      --blue:        #6b9ac4;
+      --red:         #b85030;
+      --red-light:   #d4724e;
+      --text:   #dce8d0;
+      --text-2: #8aaa78;
+      --text-3: #4a6840;
+      --display: 'Fraunces', Georgia, serif;
+      --mono:    'DM Mono', 'Courier New', monospace;
+      --body:    'Lato', sans-serif;
+      --header-bg:  rgba(8, 15, 8, 0.90);
+      --grain-opacity: 0.45;
+    }
+
+    [data-theme="light"] {
+      --bg:        #f4f8f1;
+      --bg-2:      #eaf2e5;
+      --surface:   #e2ecdb;
+      --surface-2: #d4e5cb;
+      --surface-3: #c4d9b8;
+      --border:        rgba(40, 105, 18, 0.15);
+      --border-bright: rgba(40, 105, 18, 0.35);
+      --green:       #2a7818;
+      --green-light: #389a20;
+      --green-pale:  #1c5010;
+      --amber:       #9a5c08;
+      --amber-light: #c07818;
+      --ember:       #b82f10;
+      --ember-light: #d44a28;
+      --blue:        #28599a;
+      --red:         #8c1e08;
+      --red-light:   #b83218;
+      --text:   #141e0e;
+      --text-2: #385828;
+      --text-3: #658050;
+      --header-bg:  rgba(244, 248, 241, 0.94);
+      --grain-opacity: 0.08;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999; opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 1.1rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--header-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-3); pointer-events: none;
+    }
+    .theme-toggle {
+      background: none; border: 1px solid var(--border-bright);
+      border-radius: 50%; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-3); flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover { color: var(--green-light); border-color: var(--green-light); }
+    .theme-toggle span { display: flex; line-height: 0; }
+    .live-badge {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-family: var(--mono); font-size: 0.6rem;
+      color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); animation: blink 2.2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.3; transform: scale(0.6); }
+    }
+    .back-link {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
+      color: var(--text-3); text-decoration: none; text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--green-light); }
+    .logo {
+      font-family: var(--display); font-size: 1.35rem; font-weight: 400;
+      color: var(--green-light); letter-spacing: -0.025em;
+      display: flex; align-items: center; gap: 0.55rem; text-decoration: none;
+    }
+    .logo em { font-style: italic; font-weight: 200; color: var(--text-3); }
+
+    /* ─── GLOW + FOLHAS ─── */
+    .page-glow {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 30%, rgba(35, 85, 15, 0.24) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 40% at 15% 85%, rgba(20, 50, 10, 0.16) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 30% at 85% 15%, rgba(10, 35, 5, 0.14) 0%, transparent 60%);
+    }
+    [data-theme="light"] .page-glow {
+      background:
+        radial-gradient(ellipse 75% 65% at 50% 40%, rgba(40,105,18,0.27) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 55% at 8% 75%,  rgba(30,90,10,0.20) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 45% at 92% 15%, rgba(20,75,8,0.18)  0%, transparent 55%);
+    }
+    .leaf { position: fixed; pointer-events: none; z-index: 1; opacity: 0.04; }
+    .leaf-1 { top: 10%; left: 5%;  width: 200px; transform: rotate(-20deg); }
+    .leaf-2 { bottom: 15%; right: 3%; width: 280px; transform: rotate(30deg); }
+    .leaf-3 { top: 35%; right: 6%;  width: 140px; transform: rotate(-50deg); opacity: 0.03; }
+    .leaf-4 { top: 60%; right: 18%; width: 90px;  transform: rotate(18deg);  opacity: 0.03; }
+    .leaf-5 { top: 55%; left: 8%;  width: 85px;  transform: rotate(-65deg) scaleX(-1); opacity: 0.03; }
+    [data-theme="light"] .leaf   { opacity: 0.13; }
+    [data-theme="light"] .leaf-3 { opacity: 0.09; }
+    [data-theme="light"] .leaf-4 { opacity: 0.08; }
+    [data-theme="light"] .leaf-5 { opacity: 0.08; }
+
+    .page-wrap { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; padding: 5.5rem 2rem 4rem; }
+
+    /* ─── PARTÍCULAS ─── */
+    .particles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+    .particle  { position: absolute; border-radius: 50%; background: var(--green); opacity: 0.12; animation: floatP linear infinite; }
+    @keyframes floatP {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.12; } 90%  { opacity: 0.06; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+    @keyframes floatP-light {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.165; } 90%  { opacity: 0.083; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+    [data-theme="light"] .particle { animation-name: floatP-light; }
+
+    /* ─── HERO ─── */
+    .res-hero {
+      display: grid; grid-template-columns: auto 1fr;
+      align-items: center; gap: 3rem; padding: 3rem 0 3.5rem;
+    }
+    @media (max-width: 768px) {
+      .res-hero { grid-template-columns: 1fr; padding: 2rem 0 2.5rem; justify-items: center; }
+    }
+    .hero-col-gauge { display: flex; flex-direction: column; align-items: center; }
+    .hero-col-info  { display: flex; flex-direction: column; gap: 1.5rem; justify-content: center; }
+    .hero-headline  {
+      font-family: var(--display); font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400; line-height: 1.15;
+    }
+    .hero-headline em { font-style: italic; font-weight: 200; color: var(--green-light); }
+    .hero-status-pill {
+      display: inline-flex; align-items: center; padding: 0.4rem 1rem;
+      border-radius: 999px; border: 1px solid;
+      font-family: var(--display); font-style: italic; font-size: 0.95rem;
+      width: fit-content; transition: all 0.5s;
+    }
+    @keyframes riseUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ─── GAUGE ─── */
+    .meter-wrap {
+      position: relative; width: min(290px, 80vw); height: min(290px, 80vw);
+      animation: riseUp 0.9s 0.2s ease both;
+    }
+    .meter-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .meter-track { fill: none; stroke: var(--surface-3); stroke-width: 7; }
+    [data-theme="light"] .meter-track { stroke: rgba(40, 105, 18, 0.22); }
+    .meter-fill {
+      fill: none; stroke: var(--green); stroke-width: 7; stroke-linecap: round;
+      transition: stroke-dashoffset 0.9s cubic-bezier(0.34,1.4,0.64,1), stroke 0.5s ease;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+    [data-theme="light"] .meter-fill { filter: none; }
+    .meter-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; pointer-events: none;
+    }
+    .meter-kg { font-family: var(--mono); font-size: 2.6rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1; transition: color 0.5s ease; }
+    .meter-unit { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.1em; margin-top: 0.3rem; }
+    .meter-status { font-family: var(--display); font-style: italic; font-size: 0.82rem; color: var(--text-2); margin-top: 0.6rem; max-width: 130px; line-height: 1.3; }
+    .benchmarks {
+      position: absolute; inset: -30px; display: flex; align-items: flex-end;
+      justify-content: space-between; padding: 0 10px 0; pointer-events: none;
+    }
+    .bm { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.07em; line-height: 1.4; }
+    .bm-br    { color: var(--amber); }
+    .bm-world { color: var(--red-light); }
+
+    /* ─── HERO CATS (3 escopos) ─── */
+    .hero-cats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 600px) { .hero-cats { grid-template-columns: 1fr 1fr; } }
+    .hero-cat-item { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hero-cat-label { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em; color: var(--text-3); text-transform: uppercase; }
+    .hero-cat-val   { font-family: var(--mono); font-size: 1.05rem; font-weight: 400; line-height: 1; }
+    .hero-cat-pct   { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); }
+    .hero-cat-bar-wrap { height: 3px; background: var(--surface-3); border-radius: 2px; overflow: hidden; margin-top: 0.2rem; }
+    .hero-cat-bar  { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.34,1.4,0.64,1); width: 0%; }
+
+    /* ─── STATUS MSG ─── */
+    .status-msg {
+      border: 1px solid rgba(93,168,60,0.2); background: rgba(93,168,60,0.06);
+      border-radius: 8px; padding: 1.1rem 1.4rem;
+      font-family: var(--display); font-style: italic; font-size: 0.98rem;
+      color: var(--green-pale); margin-bottom: 2rem; transition: all 0.5s; line-height: 1.5;
+    }
+
+    /* ─── BREAKDOWN (3 cards de escopo com sub-itens) ─── */
+    .breakdown-scopes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    @media (max-width: 680px) { .breakdown-scopes { grid-template-columns: 1fr; } }
+    .scope-card {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.2rem; overflow: hidden;
+    }
+    .scope-card-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .scope-card-label { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; }
+    .scope-card-val   { font-family: var(--mono); font-size: 1.4rem; font-weight: 300; line-height: 1; }
+    .scope-card-pct   { font-family: var(--mono); font-size: 0.6rem; color: var(--text-3); }
+    .scope-bar-wrap   { height: 3px; background: var(--surface-3); border-radius: 2px; margin-bottom: 0.85rem; overflow: hidden; }
+    .scope-bar        { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.34,1.4,0.64,1); }
+    .scope-sub-item   { display: flex; justify-content: space-between; align-items: baseline; padding: 0.25rem 0; border-top: 1px solid var(--border); }
+    .scope-sub-name   { font-size: 0.72rem; color: var(--text-2); }
+    .scope-sub-val    { font-family: var(--mono); font-size: 0.68rem; color: var(--text-3); }
+
+    /* ─── COMPARAÇÃO TOTAL ─── */
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 1.5rem; }
+    .comp-title-full { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1.2rem; }
+    .comp-rows-full  { display: grid; gap: 1rem; margin-bottom: 2rem; }
+    .comp-row-full   { display: grid; grid-template-columns: 140px 1fr 90px; align-items: center; gap: 1rem; }
+    .comp-label-full { font-size: 0.78rem; color: var(--text-2); }
+    .comp-bar-bg-full    { height: 5px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
+    .comp-bar-fill-full  { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.34,1.4,0.64,1); }
+    .comp-val-full   { font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); text-align: right; }
+    @media (max-width: 600px) { .comp-row-full { grid-template-columns: 100px 1fr 60px; } }
+
+    /* ─── INSIGHTS GRID ─── */
+    .insights-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 640px) { .insights-grid { grid-template-columns: 1fr; } }
+    .ins-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.6rem; }
+    .ins-card-title { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 1rem; }
+
+    /* Equivalências */
+    .equiv-item { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .equiv-val   { font-family: var(--display); font-size: 1.7rem; font-weight: 400; color: var(--green-light); line-height: 1; }
+    .equiv-label { font-size: 0.82rem; color: var(--text-2); }
+
+    /* Maior alavanca */
+    .alavanca-cat    { font-family: var(--display); font-size: 1.4rem; font-weight: 400; color: var(--amber-light); margin-bottom: 0.3rem; }
+    .alavanca-saving { font-size: 0.85rem; color: var(--text-2); line-height: 1.5; }
+    .alavanca-saving strong { color: var(--text); }
+
+    /* Metas climáticas */
+    .meta-bar-wrap { position: relative; height: 8px; background: var(--surface-3); border-radius: 4px; margin: 0.75rem 0; }
+    .meta-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+    .meta-markers  { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.58rem; color: var(--text-3); letter-spacing: 0.06em; margin-top: 0.3rem; }
+    .meta-msg      { font-size: 0.82rem; color: var(--text-2); margin-top: 0.75rem; line-height: 1.5; }
+
+    /* Comparação por escopo */
+    .comp-cat-row  { margin-bottom: 0.9rem; }
+    .comp-cat-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.3rem; }
+    .comp-bars     { display: flex; flex-direction: column; gap: 4px; }
+    .comp-bar-row  { display: grid; grid-template-columns: 50px 1fr 60px; align-items: center; gap: 0.5rem; }
+    .comp-bar-who  { font-family: var(--mono); font-size: 0.56rem; color: var(--text-3); letter-spacing: 0.06em; }
+    .comp-bar-bg   { background: var(--surface-3); border-radius: 3px; height: 7px; overflow: hidden; }
+    .comp-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .comp-bar-val  { font-family: var(--mono); font-size: 0.58rem; color: var(--text-2); text-align: right; }
+
+    /* ─── DICAS ─── */
+    .tips-section { padding: 2rem 0 3rem; }
+    .tips-section h2 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 400; margin-bottom: 0.5rem; }
+    .tips-sub  { color: var(--text-2); font-size: 0.88rem; margin-bottom: 2rem; }
+    .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
+    .tip       { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; transition: transform 0.3s, border-color 0.3s; }
+    .tip:hover { transform: translateY(-4px); border-color: var(--border-bright); }
+    .tip-icon  { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-bright); color: var(--green-light); margin-bottom: 0.9rem; }
+    .tip-title { font-family: var(--display); font-size: 1rem; font-weight: 400; color: var(--text); margin-bottom: 0.35rem; }
+    .tip-text  { font-size: 0.78rem; color: var(--text-2); line-height: 1.55; }
+
+    /* ─── LEAD CAPTURE ─── */
+    .lead-card {
+      background: var(--surface); border: 1px solid var(--border-bright);
+      border-radius: 16px; padding: 2.5rem 2rem; margin-bottom: 2rem; text-align: center;
+    }
+    .lead-title { font-family: var(--display); font-size: 1.7rem; font-weight: 400; margin-bottom: 0.5rem; line-height: 1.2; }
+    .lead-title em { font-style: italic; font-weight: 200; color: var(--green-light); }
+    .lead-sub  { font-size: 0.88rem; color: var(--text-2); margin-bottom: 1.8rem; line-height: 1.6; }
+    .lead-form { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+    .lead-form input {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.8rem 1.2rem; color: var(--text); font-family: var(--body); font-size: 0.95rem;
+      min-width: 200px; flex: 1; outline: none; transition: border-color 0.2s;
+    }
+    .lead-form input:focus { border-color: var(--green); }
+    .lead-form button {
+      background: var(--green); color: #fff; border: none; border-radius: 10px;
+      padding: 0.8rem 2rem; font-family: var(--body); font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, transform 0.2s;
+    }
+    .lead-form button:hover { background: var(--green-light); transform: translateY(-1px); }
+    .lead-thanks { display: none; }
+    .thanks-greeting { font-family: var(--display); font-size: 1.1rem; font-weight: 400; color: var(--green-light); margin-bottom: 0.3rem; }
+    .thanks-sub { font-size: 0.85rem; color: var(--text-2); margin-bottom: 2rem; line-height: 1.5; }
+    .btn-pdf {
+      display: flex; width: 100%; max-width: 520px; margin: 0 auto 0.75rem;
+      padding: 1.3rem 2rem;
+      background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+      color: #fff; border: none; border-radius: 14px;
+      font-family: var(--display); font-size: 1.35rem; font-weight: 400;
+      letter-spacing: -0.01em; cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 4px 28px rgba(93,168,60,0.35);
+      align-items: center; justify-content: center; gap: 0.75rem;
+    }
+    .btn-pdf:hover { transform: translateY(-4px); box-shadow: 0 10px 40px rgba(93,168,60,0.45); }
+    .btn-pdf:active { transform: translateY(-1px); }
+    .pdf-note { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--text-3); text-transform: uppercase; margin-top: 0.5rem; }
+
+    /* ─── FALLBACK ─── */
+    .no-data { display: none; text-align: center; padding: 5rem 2rem; }
+    .no-data p { color: var(--text-2); margin-bottom: 1.5rem; }
+    .no-data a { color: var(--green-light); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; }
+    .no-data a:hover { color: var(--green); }
+
+    /* ─── FOOTER ─── */
+    footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; text-align: center; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em; color: var(--text-3); text-transform: uppercase; }
+
+    @media (max-width: 600px) {
+      header { padding: 0.9rem 1.2rem; }
+      .page-wrap { padding: 5rem 1rem 3rem; }
+      .meter-wrap { width: min(260px, 78vw); height: min(260px, 78vw); }
+      .meter-kg { font-size: 2rem; }
+      .hero-headline { font-size: 1.7rem; }
+      .hero-col-info { gap: 1rem; }
+    }
+    @media (max-width: 769px) { .header-center { display: none; } }
+  </style>
+</head>
+<body>
+
+<!-- Glow atmosférico -->
+<div class="page-glow"></div>
+
+<!-- Partículas flutuantes -->
+<div class="particles" id="particles"></div>
+
+<!-- Folhas decorativas -->
+<svg class="leaf leaf-1" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+  <line x1="100" y1="180" x2="60" y2="140" stroke="#5da83c" stroke-width="0.8"/>
+  <line x1="100" y1="200" x2="140" y2="160" stroke="#5da83c" stroke-width="0.8"/>
+  <line x1="100" y1="140" x2="65" y2="100" stroke="#5da83c" stroke-width="0.8"/>
+</svg>
+<svg class="leaf leaf-2" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+</svg>
+<svg class="leaf leaf-3" viewBox="0 0 200 300" fill="none">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+</svg>
+<svg class="leaf leaf-4" viewBox="0 0 200 300" fill="none">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+</svg>
+<svg class="leaf leaf-5" viewBox="0 0 200 300" fill="none">
+  <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+  <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+</svg>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <a href="empresarial.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="12.5" stroke="currentColor" stroke-opacity="0.2" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
+        <circle cx="16" cy="16" r="12.5" style="stroke:var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
+        <path d="M16 23 C11.5 19.5 11 13 16 9 C21 13 20.5 19.5 16 23Z" style="stroke:var(--green-light)" fill="none" stroke-width="1.3" stroke-linejoin="round" transform="rotate(-45 16 16)"/>
+        <circle cx="16" cy="16" r="1.5" style="fill:var(--green)"/>
+      </svg>
+      CarbonôMetro <em>Brasil</em>
+    </div>
+  </div>
+  <span class="header-center">Empresa · Resultado</span>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
+      <span id="themeIcon"></span>
+    </button>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Tempo real
+    </div>
+  </div>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<div class="page-wrap" id="mainContent">
+
+  <!-- Hero -->
+  <div class="res-hero">
+    <!-- Coluna esquerda: gauge -->
+    <div class="hero-col-gauge">
+      <div class="meter-wrap">
+        <svg class="meter-svg" viewBox="0 0 290 290">
+          <circle class="meter-track" cx="145" cy="145" r="118"/>
+          <circle class="meter-fill" id="resMeterFill" cx="145" cy="145" r="118"
+                  stroke-dasharray="741.4" stroke-dashoffset="741.4"/>
+        </svg>
+        <div class="meter-center">
+          <div class="meter-kg" id="resMeterKg">0,0</div>
+          <div class="meter-unit">tCO₂e / ANO</div>
+          <div class="meter-status" id="resMeterStatus">—</div>
+        </div>
+        <div class="benchmarks">
+          <div class="bm bm-br">▲ BR<br>5t/func</div>
+          <div class="bm bm-world" style="text-align:right;">▲ Alto<br>10t/func</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna direita: informações -->
+    <div class="hero-col-info">
+      <h1 class="hero-headline">Emissões da sua <em>empresa</em></h1>
+      <div id="heroStatusPill" class="hero-status-pill">—</div>
+      <div class="hero-cats">
+        <div class="hero-cat-item" id="heroS1">
+          <div class="hero-cat-label">ESCOPO 1</div>
+          <div class="hero-cat-val">— t</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--red-light)"></div></div>
+        </div>
+        <div class="hero-cat-item" id="heroS2">
+          <div class="hero-cat-label">ESCOPO 2</div>
+          <div class="hero-cat-val">— t</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--amber)"></div></div>
+        </div>
+        <div class="hero-cat-item" id="heroS3">
+          <div class="hero-cat-label">ESCOPO 3</div>
+          <div class="hero-cat-val">— t</div>
+          <div class="hero-cat-pct">—%</div>
+          <div class="hero-cat-bar-wrap"><div class="hero-cat-bar" style="background:var(--blue)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Message -->
+  <div class="status-msg" id="statusMsg" style="border-color:rgba(93,168,60,0.2)"></div>
+
+  <!-- Breakdown por escopo -->
+  <div class="breakdown-scopes">
+    <!-- Escopo 1 -->
+    <div class="scope-card" style="border-left:3px solid var(--red-light)">
+      <div class="scope-card-header">
+        <span class="scope-card-label">ESCOPO 1</span>
+        <span class="scope-card-pct" id="bd-pct-s1">0%</span>
+      </div>
+      <div class="scope-card-val" id="bd-val-s1" style="color:var(--red-light)">0,0 t</div>
+      <div class="scope-bar-wrap"><div class="scope-bar" id="bd-bar-s1" style="background:var(--red-light)"></div></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Frota</span><span class="scope-sub-val" id="bd-fleet">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Combustão</span><span class="scope-sub-val" id="bd-comb">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Refrigerantes</span><span class="scope-sub-val" id="bd-ref">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Processos</span><span class="scope-sub-val" id="bd-proc">—</span></div>
+    </div>
+    <!-- Escopo 2 -->
+    <div class="scope-card" style="border-left:3px solid var(--amber)">
+      <div class="scope-card-header">
+        <span class="scope-card-label">ESCOPO 2</span>
+        <span class="scope-card-pct" id="bd-pct-s2">0%</span>
+      </div>
+      <div class="scope-card-val" id="bd-val-s2" style="color:var(--amber-light)">0,0 t</div>
+      <div class="scope-bar-wrap"><div class="scope-bar" id="bd-bar-s2" style="background:var(--amber)"></div></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Eletricidade</span><span class="scope-sub-val" id="bd-eletric">—</span></div>
+    </div>
+    <!-- Escopo 3 -->
+    <div class="scope-card" style="border-left:3px solid var(--blue)">
+      <div class="scope-card-header">
+        <span class="scope-card-label">ESCOPO 3</span>
+        <span class="scope-card-pct" id="bd-pct-s3">0%</span>
+      </div>
+      <div class="scope-card-val" id="bd-val-s3" style="color:var(--blue)">0,0 t</div>
+      <div class="scope-bar-wrap"><div class="scope-bar" id="bd-bar-s3" style="background:var(--blue)"></div></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Deslocamento</span><span class="scope-sub-val" id="bd-comm">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Viagens</span><span class="scope-sub-val" id="bd-viag">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Frete</span><span class="scope-sub-val" id="bd-frete">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Resíduos</span><span class="scope-sub-val" id="bd-res">—</span></div>
+      <div class="scope-sub-item"><span class="scope-sub-name">Água</span><span class="scope-sub-val" id="bd-agua">—</span></div>
+    </div>
+  </div>
+
+  <!-- Comparação total -->
+  <hr class="section-divider">
+  <div class="comp-title-full">Comparação total (tCO₂e / funcionário / ano)</div>
+  <div class="comp-rows-full">
+    <div class="comp-row-full">
+      <div class="comp-label-full">Sua empresa</div>
+      <div class="comp-bar-bg-full"><div class="comp-bar-fill-full" id="res-cmp-user" style="width:0%"></div></div>
+      <div class="comp-val-full" id="res-cmp-user-val">0,0 t</div>
+    </div>
+    <div class="comp-row-full">
+      <div class="comp-label-full" style="color:var(--amber);">Benchmark BR</div>
+      <div class="comp-bar-bg-full"><div class="comp-bar-fill-full" style="width:0%;background:var(--amber)" id="res-cmp-br"></div></div>
+      <div class="comp-val-full" style="color:var(--amber);" id="res-cmp-br-val">5,0 t/func</div>
+    </div>
+    <div class="comp-row-full">
+      <div class="comp-label-full" style="color:var(--red-light);">Alto impacto</div>
+      <div class="comp-bar-bg-full"><div class="comp-bar-fill-full" style="width:0%;background:var(--red-light)" id="res-cmp-alto"></div></div>
+      <div class="comp-val-full" style="color:var(--red-light);" id="res-cmp-alto-val">10,0 t/func</div>
+    </div>
+  </div>
+
+  <!-- Insights Grid -->
+  <div class="insights-grid" id="insightsGrid">
+
+    <!-- Card 1: Equivalências -->
+    <div class="ins-card">
+      <div class="ins-card-title">Equivalências</div>
+      <div id="equivContent">
+        <div class="equiv-item">
+          <span class="equiv-val" id="equivArvores">—</span>
+          <span class="equiv-label">árvores para absorver em 1 ano</span>
+        </div>
+        <div class="equiv-item">
+          <span class="equiv-val" id="equivVoos">—</span>
+          <span class="equiv-label">voos transatlânticos equivalentes</span>
+        </div>
+        <div class="equiv-item">
+          <span class="equiv-val" id="equivCasas">—</span>
+          <span class="equiv-label">casas abastecidas por 1 ano</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Maior alavanca -->
+    <div class="ins-card">
+      <div class="ins-card-title">Maior alavanca</div>
+      <div id="alavancaContent">
+        <div class="alavanca-cat" id="alavancaCat">—</div>
+        <div class="alavanca-saving" id="alavancaSaving"></div>
+      </div>
+    </div>
+
+    <!-- Card 3: Metas climáticas (SBTi) -->
+    <div class="ins-card">
+      <div class="ins-card-title">Metas SBTi</div>
+      <div id="metasContent">
+        <div class="meta-bar-wrap">
+          <div class="meta-bar-fill" id="metaBarFill" style="width:0%;background:var(--green)"></div>
+        </div>
+        <div class="meta-markers">
+          <span>0</span>
+          <span style="color:var(--green)">1,5°C (−7%/a)</span>
+          <span style="color:var(--amber)">2°C (−4,2%/a)</span>
+          <span>ref.</span>
+        </div>
+        <div class="meta-msg" id="metaMsg"></div>
+      </div>
+    </div>
+
+    <!-- Card 4: Vs benchmark por escopo -->
+    <div class="ins-card">
+      <div class="ins-card-title">Vs benchmark BR (5t/func)</div>
+      <div id="comparacaoContent">
+        <div class="comp-cat-row" id="compS1"></div>
+        <div class="comp-cat-row" id="compS2"></div>
+        <div class="comp-cat-row" id="compS3"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dicas corporativas -->
+  <div class="tips-section">
+    <h2>Como reduzir as emissões</h2>
+    <p class="tips-sub">Iniciativas corporativas com maior retorno sobre carbono. Priorize pelo escopo com maior impacto.</p>
+    <div class="tips-grid">
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/>
+            <rect x="9" y="11" width="14" height="10" rx="2"/>
+            <line x1="13" y1="16" x2="17" y2="16"/>
+          </svg>
+        </div>
+        <div class="tip-title">Frota elétrica / híbrida</div>
+        <div class="tip-text">Substituir veículos a combustão por elétricos reduz emissões da frota em até 80%. Priorize carros e utilitários leves.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
+          </svg>
+        </div>
+        <div class="tip-title">Energia renovável (I-REC / GD Solar)</div>
+        <div class="tip-text">Certificados de energia renovável (I-REC) ou geração distribuída solar podem zerar o Escopo 2 com investimento acessível.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div class="tip-title">Teletrabalho e commuting</div>
+        <div class="tip-text">Políticas de home office reduzem diretamente o Escopo 3. Dois dias remotos por semana podem cortar o commuting em 40%.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <div class="tip-title">Logística verde</div>
+        <div class="tip-text">Frete ferroviário emite até 10× menos que o rodoviário. Consolidação de cargas e modal multimodal reduzem emissões de Escopo 3.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div class="tip-title">Eficiência energética</div>
+        <div class="tip-text">Automação predial, iluminação LED, sistemas HVAC eficientes e monitoramento em tempo real reduzem consumo e Escopo 2 em até 30%.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 22c1-4 4-8 10-10C18 10 22 6 22 2c-4 0-8 4-10 10C10 6 6 2 2 2c0 4 4 8 10 10"/>
+          </svg>
+        </div>
+        <div class="tip-title">Compensação via REDD+</div>
+        <div class="tip-text">Projetos de reflorestamento e conservação florestal certificados (REDD+) permitem neutralizar emissões residuais com rastreabilidade.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lead Capture + PDF -->
+  <div class="lead-card">
+    <div id="leadFormWrap">
+      <div class="lead-title">Baixe o relatório da sua <em>empresa</em></div>
+      <div class="lead-sub">Informe os dados do responsável para gerar um PDF completo com o inventário GHG, metas SBTi e recomendações de redução.</div>
+      <form class="lead-form" onsubmit="submitLead(event)">
+        <input type="text" id="leadNome" placeholder="Nome do responsável" required autocomplete="name">
+        <input type="email" id="leadEmail" placeholder="E-mail corporativo" required autocomplete="email">
+        <button type="submit">Gerar relatório</button>
+      </form>
+    </div>
+    <div class="lead-thanks" id="leadThanks">
+      <div class="thanks-greeting" id="thanksGreeting">Pronto!</div>
+      <div class="thanks-sub">Seu relatório corporativo está pronto. Clique abaixo para baixar.</div>
+      <button class="btn-pdf" id="btnPdf" onclick="generatePDF()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 18 15 15"/>
+        </svg>
+        Baixar PDF corporativo
+      </button>
+      <div class="pdf-note">PDF completo · GHG Protocol · Escopos 1, 2 e 3</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Fallback sem dados -->
+<div class="no-data" id="noData">
+  <p>Nenhum dado encontrado. Preencha a calculadora para ver o inventário.</p>
+  <a href="empresarial.html">← Voltar para a calculadora</a>
+</div>
+
+<footer>
+  CarbonôMetro Brasil &nbsp;·&nbsp; GHG Protocol &nbsp;·&nbsp; MCTI 2023 &nbsp;·&nbsp; SEEG &nbsp;·&nbsp; IPCC AR6 &nbsp;·&nbsp; Estimativas educacionais
+</footer>
+
+<script>
+  // ─── Dados ───────────────────────────────────────────────
+  function loadResult() {
+    try {
+      const raw = localStorage.getItem('cm_empresa_result');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch(e) { return null; }
+  }
+
+  // ─── Gauge ───────────────────────────────────────────────
+  function renderGauge(d) {
+    const circ  = 2 * Math.PI * 118; // 741.4
+    const maxT  = 5000; // escala corporativa: 5000t
+    const pct   = Math.min(d.totalT / maxT, 1);
+    const offset= circ * (1 - pct);
+
+    const fill = document.getElementById('resMeterFill');
+    fill.style.strokeDashoffset = offset;
+    fill.style.strokeDasharray  = circ;
+    fill.style.stroke = d.color;
+
+    const kg = document.getElementById('resMeterKg');
+    kg.textContent = d.totalT.toFixed(1).replace('.', ',');
+    kg.style.color = d.color;
+    document.getElementById('resMeterStatus').textContent = d.statusTxt;
+
+    const pill = document.getElementById('heroStatusPill');
+    pill.textContent    = d.statusTxt;
+    pill.style.background  = d.color + '22';
+    pill.style.borderColor = d.color + '55';
+    pill.style.color       = d.color;
+
+    // 3 escopos no painel direito
+    const fmtT = (n) => (n / 1000).toFixed(1).replace('.', ',');
+    const scopeData = [
+      { id: 'heroS1', val: d.emis.s1, pct: d.pct.s1, color: 'var(--red-light)' },
+      { id: 'heroS2', val: d.emis.s2, pct: d.pct.s2, color: 'var(--amber)'     },
+      { id: 'heroS3', val: d.emis.s3, pct: d.pct.s3, color: 'var(--blue)'      },
+    ];
+    scopeData.forEach(c => {
+      const el = document.getElementById(c.id);
+      el.querySelector('.hero-cat-val').textContent = fmtT(c.val) + ' t';
+      el.querySelector('.hero-cat-pct').textContent = c.pct + '%';
+      const bar = el.querySelector('.hero-cat-bar');
+      bar.style.width      = c.pct + '%';
+      bar.style.background = c.color;
+    });
+  }
+
+  // ─── Status Message ──────────────────────────────────────
+  function renderStatusMsg(d) {
+    const intensity = d.intensity;
+    let msg;
+    if (intensity < 2) {
+      msg = `Intensidade exemplar (${intensity.toFixed(1).replace('.',',')} tCO₂e/func). Sua empresa está entre as mais eficientes do Brasil. Considere publicar um Relatório GHG.`;
+    } else if (intensity < 5) {
+      msg = `Boa performance (${intensity.toFixed(1).replace('.',',')} tCO₂e/func). Abaixo do benchmark BR de 5 t/func. Um plano de redução pode antecipar metas ESG.`;
+    } else if (intensity < 10) {
+      msg = `Intensidade acima do benchmark (${intensity.toFixed(1).replace('.',',')} tCO₂e/func vs 5,0 t referência BR). Recomendamos metas de redução e inventário formal.`;
+    } else {
+      msg = `Alta intensidade de carbono (${intensity.toFixed(1).replace('.',',')} tCO₂e/func). Inventário completo, metas SBTi e plano de ação imediato são fortemente recomendados.`;
+    }
+    const el = document.getElementById('statusMsg');
+    el.textContent       = msg;
+    el.style.borderColor = d.color + '44';
+    el.style.background  = d.color + '14';
+  }
+
+  // ─── Breakdown ───────────────────────────────────────────
+  function renderBreakdown(d) {
+    const fmtT = (n) => (n / 1000).toFixed(1).replace('.', ',') + ' t';
+    const total = d.emis.s1 + d.emis.s2 + d.emis.s3;
+    const maxS  = Math.max(d.emis.s1, d.emis.s2, d.emis.s3, 1);
+
+    [['s1', d.emis.s1, 's1'], ['s2', d.emis.s2, 's2'], ['s3', d.emis.s3, 's3']].forEach(([k, v]) => {
+      document.getElementById('bd-val-' + k).textContent = fmtT(v);
+      document.getElementById('bd-pct-' + k).textContent = (total > 0 ? Math.round(v / total * 100) : 0) + '%';
+      document.getElementById('bd-bar-' + k).style.width = Math.min(v / maxS * 100, 100) + '%';
+    });
+
+    const sub = (id, val) => { document.getElementById(id).textContent = fmtT(val); };
+    sub('bd-fleet',  d.emis.fleet);
+    sub('bd-comb',   d.emis.comb);
+    sub('bd-ref',    d.emis.ref);
+    sub('bd-proc',   d.emis.proc);
+    sub('bd-eletric',d.emis.eletric);
+    sub('bd-comm',   d.emis.comm);
+    sub('bd-viag',   d.emis.viag);
+    sub('bd-frete',  d.emis.frete);
+    sub('bd-res',    d.emis.res);
+    sub('bd-agua',   d.emis.agua);
+  }
+
+  // ─── Comparação Total ────────────────────────────────────
+  function renderComparacaoTotal(d) {
+    const nFunc = d.nFunc || 1;
+    const intensity = d.intensity;
+    const brIntensity  = 5;
+    const altIntensity = 10;
+    const compMax = Math.max(intensity, altIntensity, 1);
+
+    const userEl = document.getElementById('res-cmp-user');
+    userEl.style.width      = Math.min(intensity / compMax * 100, 100) + '%';
+    userEl.style.background = d.color;
+    document.getElementById('res-cmp-user-val').textContent = intensity.toFixed(1).replace('.', ',') + ' t/func';
+
+    document.getElementById('res-cmp-br').style.width   = Math.min(brIntensity / compMax * 100, 100) + '%';
+    document.getElementById('res-cmp-alto').style.width = Math.min(altIntensity / compMax * 100, 100) + '%';
+    document.getElementById('res-cmp-br-val').textContent   = brIntensity.toFixed(1) + ' t/func';
+    document.getElementById('res-cmp-alto-val').textContent = altIntensity.toFixed(1) + ' t/func';
+  }
+
+  // ─── Equivalências (escala corporativa) ──────────────────
+  function renderEquiv(d) {
+    const kg = d.total;
+    const arvores = Math.round(kg / 21);
+    const voos    = Math.round(kg / 4700);  // voo transatlântico ~4700 kg CO₂
+    const casas   = Math.round(kg / 2900);  // casa média BR ~2900 kg CO₂/ano
+
+    document.getElementById('equivArvores').textContent = arvores.toLocaleString('pt-BR');
+    document.getElementById('equivVoos').textContent    = voos.toLocaleString('pt-BR');
+    document.getElementById('equivCasas').textContent   = casas.toLocaleString('pt-BR');
+  }
+
+  // ─── Maior Alavanca ──────────────────────────────────────
+  function renderAlavanca(d) {
+    const escopos = [
+      { label: 'Escopo 1 — Diretas', val: d.emis.s1, pct: d.pct.s1 },
+      { label: 'Escopo 2 — Energia', val: d.emis.s2, pct: d.pct.s2 },
+      { label: 'Escopo 3 — Cadeia',  val: d.emis.s3, pct: d.pct.s3 },
+    ];
+    const max     = escopos.reduce((a, b) => b.val > a.val ? b : a);
+    const saving20 = Math.round(max.val * 0.20);
+
+    document.getElementById('alavancaCat').textContent = max.label;
+    document.getElementById('alavancaSaving').innerHTML =
+      'Representa <strong>' + max.pct + '%</strong> do total.<br>' +
+      'Reduzir 20% economizaria <strong>' + (saving20 / 1000).toFixed(1).replace('.', ',') + ' tCO₂e/ano</strong>.';
+  }
+
+  // ─── Metas Climáticas (SBTi) ─────────────────────────────
+  function renderMetas(d) {
+    const intensity = d.intensity;
+    // Referência SBTi: 4,2% redução/ano para 2°C; 7%/ano para 1,5°C
+    // Barra: 0 → intensity, marcador em 2°C (4,2) e 1,5°C (7) a.a. de redução
+    const maxBar = Math.max(intensity, 15);
+    const pct    = Math.min(intensity / maxBar * 100, 100);
+    const bar    = document.getElementById('metaBarFill');
+    bar.style.width      = pct + '%';
+    bar.style.background = d.color;
+
+    const redMeta2  = (intensity * 0.042).toFixed(1).replace('.', ',');
+    const redMeta15 = (intensity * 0.07).toFixed(1).replace('.', ',');
+    let msg;
+    if (intensity < 4.2) {
+      msg = `Excelente! Intensidade abaixo da referência SBTi 2°C. Para 1,5°C precisa reduzir ${redMeta15} t/func/ano.`;
+    } else if (intensity < 7) {
+      msg = `Dentro da trajetória 2°C (−4,2%/ano = −${redMeta2} t/func/ano). Para 1,5°C: −${redMeta15} t/func/ano.`;
+    } else {
+      msg = `Acima das metas SBTi. Para trajetória 2°C: −${redMeta2} t/func/ano (−4,2%/ano). Para 1,5°C: −${redMeta15} t/func/ano.`;
+    }
+    document.getElementById('metaMsg').textContent = msg;
+  }
+
+  // ─── Comparação por Escopo vs Benchmark ──────────────────
+  function renderComparacao(d) {
+    const nFunc = d.nFunc || 1;
+    // Benchmark BR distribuição aproximada: S1=2t, S2=1.5t, S3=1.5t (total 5t/func)
+    const BR = { s1: 2000 * nFunc, s2: 1500 * nFunc, s3: 1500 * nFunc };
+    const scopes = [
+      { id: 'compS1', label: 'Escopo 1', val: d.emis.s1, br: BR.s1, color: 'var(--red-light)' },
+      { id: 'compS2', label: 'Escopo 2', val: d.emis.s2, br: BR.s2, color: 'var(--amber)' },
+      { id: 'compS3', label: 'Escopo 3', val: d.emis.s3, br: BR.s3, color: 'var(--blue)' },
+    ];
+    scopes.forEach(cat => {
+      const maxVal = Math.max(cat.val, cat.br, 100);
+      const pctYou = Math.min(cat.val / maxVal * 100, 100);
+      const pctBR  = Math.min(cat.br  / maxVal * 100, 100);
+      const fmtT   = (n) => (n / 1000).toFixed(1).replace('.', ',') + ' t';
+      const el = document.getElementById(cat.id);
+      el.innerHTML = `
+        <div class="comp-cat-label">${cat.label}</div>
+        <div class="comp-bars">
+          <div class="comp-bar-row">
+            <span class="comp-bar-who">Empresa</span>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${pctYou}%;background:${cat.color}"></div></div>
+            <span class="comp-bar-val">${fmtT(cat.val)}</span>
+          </div>
+          <div class="comp-bar-row">
+            <span class="comp-bar-who">BR ref.</span>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${pctBR}%;background:var(--surface-3)"></div></div>
+            <span class="comp-bar-val">${fmtT(cat.br)}</span>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // ─── Captura de Lead ─────────────────────────────────────
+  function submitLead(e) {
+    e.preventDefault();
+    const nome  = document.getElementById('leadNome').value.trim();
+    const email = document.getElementById('leadEmail').value.trim();
+    if (!nome || !email) return;
+
+    const leads = JSON.parse(localStorage.getItem('cm_leads_empresa') || '[]');
+    leads.push({ nome, email, savedAt: new Date().toISOString() });
+    localStorage.setItem('cm_leads_empresa', JSON.stringify(leads));
+
+    document.getElementById('leadFormWrap').style.display = 'none';
+    document.getElementById('thanksGreeting').textContent = 'Pronto, ' + nome.split(' ')[0] + '!';
+    const thanks = document.getElementById('leadThanks');
+    thanks.style.display = 'block';
+  }
+
+  // ─── Gerar PDF corporativo ───────────────────────────────
+  function generatePDF() {
+    if (!window.jspdf) { alert('Biblioteca PDF não carregada. Verifique sua conexão.'); return; }
+
+    const d = loadResult();
+    if (!d) { alert('Nenhum dado encontrado.'); return; }
+
+    const btn = document.getElementById('btnPdf');
+    btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
+
+    setTimeout(() => {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        const W = 210, H = 297, ML = 15, MR = 15, MT = 12, CW = W - ML - MR;
+        let y = MT;
+
+        const INK    = [20,  30,  20];
+        const INK2   = [90, 105,  85];
+        const INK3   = [150, 160, 145];
+        const GREEN  = [60, 140,  35];
+        const AMBER  = [180, 110,  20];
+        const RED    = [170,  55,  30];
+        const BLUE   = [50, 110, 175];
+        const BGGRAY = [245, 247, 244];
+        const BGDARK = [30,  45,  28];
+
+        const rgb   = (c) => doc.setTextColor(...c);
+        const fill  = (c) => doc.setFillColor(...c);
+        const draw  = (c) => doc.setDrawColor(...c);
+        const lw    = (n) => doc.setLineWidth(n);
+        const font  = (sz, st='normal') => { doc.setFontSize(sz); doc.setFont('helvetica', st); };
+        const txt   = (s, x, yy, opts) => doc.text(s, x, yy, opts || {});
+        const rect  = (x, yy, w, h, s='F') => doc.rect(x, yy, w, h, s);
+        const hline = (yy, c=INK3, th=0.2) => { lw(th); draw(c); doc.line(ML, yy, W-MR, yy); };
+        const fmtN  = (n) => ((n||0)/1000).toFixed(2).replace('.', ',');
+        const fmtT1 = (n) => ((n||0)/1000).toFixed(1).replace('.', ',');
+        const today = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+        const empresa = d.empresa || 'Empresa não identificada';
+        const setor   = d.setor   || '—';
+        const nFunc   = d.nFunc   || 1;
+        const anoBase = d.anoBase || '2024';
+        const totalT  = d.totalT;
+        const intensity = d.intensity;
+
+        const intColor = intensity < 2 ? GREEN : intensity < 5 ? GREEN : intensity < 10 ? AMBER : RED;
+
+        const addFooter = () => {
+          const pg = doc.internal.getCurrentPageInfo().pageNumber;
+          lw(0.2); draw(INK3);
+          doc.line(ML, H-10, W-MR, H-10);
+          font(6); rgb(INK3);
+          txt('CarbonôMetro Empresarial  ·  GHG Protocol  ·  MCTI 2023  ·  IPCC AR6', ML, H-6);
+          txt(`Emitido em ${today}  ·  Página ${pg}`, W-MR, H-6, { align:'right' });
+        };
+        const newPage = () => { addFooter(); doc.addPage(); y = MT; };
+        const checkPage = (needed) => { if (y + needed > H - 18) newPage(); };
+
+        // HEADER DARK
+        fill(BGDARK); rect(0, 0, W, 42);
+        fill(GREEN);  rect(0, 0, 4, 42);
+        font(7); rgb([130, 180, 100]);
+        txt('CARBONÔMETRO EMPRESARIAL  ·  INVENTÁRIO GHG', ML+6, 10);
+        font(16, 'bold'); rgb([225, 245, 210]);
+        txt('Relatório de Emissões de Gases de Efeito Estufa', ML+6, 21);
+        font(8); rgb([150, 190, 130]);
+        txt(`${empresa}  ·  ${setor}`, ML+6, 30);
+        font(7); rgb([90, 130, 75]);
+        txt(`Ano-base: ${anoBase}  ·  Colaboradores: ${nFunc}  ·  Emitido em: ${today}`, ML+6, 37);
+        y = 52;
+
+        // SEÇÃO 1 — RESUMO DE ESCOPOS
+        font(7, 'bold'); rgb(INK2);
+        txt('1. RESUMO POR ESCOPO', ML, y);
+        hline(y+2, GREEN, 0.4); y += 7;
+
+        const colX = [ML, ML+55, ML+95, ML+135];
+        fill(BGDARK); rect(ML, y, CW, 8);
+        font(6.5, 'bold'); rgb([200, 230, 185]);
+        txt('Escopo / Categoria', colX[0]+2, y+5.5);
+        txt('tCO₂e / ano', colX[1]+2, y+5.5);
+        txt('% do total', colX[2]+2, y+5.5);
+        txt('kg CO₂e / colab', colX[3]+2, y+5.5);
+        y += 8;
+
+        const scopeRows = [
+          { label:'Escopo 1 — Emissões Diretas',         val: d.emis.s1, color: RED   },
+          { label:'  Frota própria',                      val: d.emis.fleet,  color: INK2, indent:true },
+          { label:'  Combustão estacionária',             val: d.emis.comb,   color: INK2, indent:true },
+          { label:'  Gases refrigerantes',                val: d.emis.ref,    color: INK2, indent:true },
+          { label:'  Processos industriais',              val: d.emis.proc,   color: INK2, indent:true },
+          { label:'Escopo 2 — Energia Comprada',          val: d.emis.s2, color: AMBER },
+          { label:'  Eletricidade (líq. de renováveis)',  val: d.emis.eletric, color: INK2, indent:true },
+          { label:'Escopo 3 — Cadeia de Valor',           val: d.emis.s3, color: BLUE  },
+          { label:'  Commuting de colaboradores',         val: d.emis.comm,  color: INK2, indent:true },
+          { label:'  Viagens corporativas',               val: d.emis.viag,  color: INK2, indent:true },
+          { label:'  Frete e logística',                  val: d.emis.frete, color: INK2, indent:true },
+          { label:'  Resíduos sólidos',                   val: d.emis.res,   color: INK2, indent:true },
+          { label:'  Consumo de água',                    val: d.emis.agua,  color: INK2, indent:true },
+        ];
+
+        let rowAlt = false;
+        scopeRows.forEach((row) => {
+          checkPage(8);
+          if (!row.indent) {
+            fill(row.color); rect(ML, y, 3, 7);
+            fill(BGGRAY);    rect(ML+3, y, CW-3, 7);
+            font(7, 'bold'); rgb(row.color);
+          } else {
+            if (rowAlt) { fill([250,252,249]); } else { fill([255,255,255]); }
+            rect(ML, y, CW, 7);
+            font(6.5); rgb(INK2);
+            rowAlt = !rowAlt;
+          }
+          const totalKg = d.total;
+          const pct = totalKg > 0 ? (row.val / totalKg * 100).toFixed(1) : '0,0';
+          const perColab = nFunc > 0 ? (row.val / nFunc).toFixed(0) : '0';
+          txt(row.label, colX[0]+5, y+5);
+          if (!row.indent) { font(7,'bold'); rgb(row.color); } else { font(6.5); rgb(INK2); }
+          txt(fmtN(row.val), colX[1]+2, y+5);
+          txt(pct.replace('.',',') + '%', colX[2]+2, y+5);
+          txt(perColab, colX[3]+2, y+5);
+          y += 7;
+        });
+
+        // Linha total
+        checkPage(10);
+        fill(BGDARK); rect(ML, y, CW, 9);
+        font(8, 'bold'); rgb([225, 245, 210]);
+        txt('TOTAL GERAL', colX[0]+5, y+6.5);
+        txt(totalT.toFixed(2).replace('.', ','), colX[1]+2, y+6.5);
+        txt('100%', colX[2]+2, y+6.5);
+        txt((totalT/nFunc*1000).toFixed(0), colX[3]+2, y+6.5);
+        y += 14;
+
+        // SEÇÃO 2 — INDICADORES
+        checkPage(50);
+        font(7, 'bold'); rgb(INK2);
+        txt('2. INDICADORES DE INTENSIDADE', ML, y);
+        hline(y+2, GREEN, 0.4); y += 7;
+
+        const cardW = (CW - 6) / 3;
+        const intStatus = intensity < 2 ? 'Intensidade exemplar' : intensity < 5 ? 'Abaixo do benchmark BR' : intensity < 10 ? 'Acima do benchmark BR' : 'Alto impacto';
+        const cards = [
+          { label:'Total de emissões',        val: totalT.toFixed(1).replace('.', ',') + ' tCO₂e',  sub:'ano-base ' + anoBase },
+          { label:'Intensidade / colaborador', val: intensity.toFixed(1).replace('.', ',') + ' tCO₂e', sub:'por colaborador / ano' },
+          { label:'Status vs benchmark BR',    val: intStatus, sub:'referência: 5,0 tCO₂e/colab' },
+        ];
+        cards.forEach((c, i) => {
+          const cx = ML + i * (cardW + 3);
+          fill(BGGRAY); rect(cx, y, cardW, 22);
+          fill(intColor); rect(cx, y, cardW, 1.5);
+          font(6.5); rgb(INK3); txt(c.label, cx+3, y+8);
+          font(9, 'bold'); rgb(intColor);
+          const vlines = doc.splitTextToSize(c.val, cardW-6);
+          doc.text(vlines, cx+3, y+15);
+          font(6); rgb(INK3); txt(c.sub, cx+3, y+21);
+        });
+        y += 28;
+
+        // Barras comparativas
+        checkPage(28);
+        font(6.5, 'bold'); rgb(INK2);
+        txt('Comparação de intensidade por colaborador (tCO₂e/colab/ano)', ML, y); y += 5;
+        const barData = [
+          { label:'Sua empresa', val: intensity, color: intColor },
+          { label:'Benchmark BR', val: 5,        color: AMBER    },
+          { label:'Alto impacto', val: 10,        color: RED      },
+        ];
+        const cmpMax = Math.max(intensity, 10);
+        const barLW = 45, barVW = 18, barAW = CW - barLW - barVW - 4;
+        barData.forEach((b) => {
+          checkPage(10);
+          fill(BGGRAY); rect(ML, y, CW, 8);
+          font(6.5); rgb(INK2); txt(b.label, ML+2, y+5.5);
+          const fpx = Math.min(b.val / cmpMax, 1) * barAW;
+          fill(b.color); rect(ML + barLW, y+2, Math.max(fpx, 0.5), 4);
+          fill([220,228,218]); rect(ML + barLW + Math.max(fpx,0.5), y+2, barAW - Math.max(fpx,0.5), 4);
+          font(7, 'bold'); rgb(b.color);
+          txt(b.val.toFixed(1).replace('.', ',') + ' t', W-MR, y+5.5, { align:'right' });
+          y += 9;
+        });
+        y += 6;
+
+        // SEÇÃO 3 — METODOLOGIA
+        checkPage(60);
+        font(7, 'bold'); rgb(INK2);
+        txt('3. METODOLOGIA E FATORES DE EMISSÃO', ML, y);
+        hline(y+2, GREEN, 0.4); y += 7;
+
+        const metodItems = [
+          ['Metodologia', 'Programa Brasileiro GHG Protocol (MCTI / FGV CERI). Abordagem por controle operacional.'],
+          ['Escopo 1', 'Emissões diretas de fontes controladas: frota própria, combustão estacionária (diesel, GN, GLP) e gases refrigerantes fugitivos (R-410A, GWP=2088 — IPCC AR6).'],
+          ['Escopo 2', 'Emissões indiretas da eletricidade comprada. Fatores regionais MCTI 2023: Norte 0,07 | Nordeste 0,08 | Centro-Oeste 0,09 | Sudeste/Sul 0,082 kg CO₂/kWh.'],
+          ['Escopo 3', 'Commuting de colaboradores, viagens aéreas, hospedagem, frete rodoviário e aéreo, disposição de resíduos e consumo de água.'],
+          ['Aviso', 'Este relatório tem caráter estimativo e não substitui um inventário GHG formal verificado por especialista certificado conforme o Programa Brasileiro GHG Protocol.'],
+        ];
+        metodItems.forEach(([label, body]) => {
+          checkPage(16);
+          fill(BGGRAY); rect(ML, y, CW, 6);
+          font(6.5, 'bold'); rgb(label === 'Aviso' ? RED : INK);
+          txt(label, ML+3, y+4.5); y += 6;
+          font(6.5); rgb(INK2);
+          const lines = doc.splitTextToSize(body, CW - 6);
+          checkPage(lines.length * 4 + 4);
+          doc.text(lines, ML+3, y+3.5);
+          y += lines.length * 4 + 5;
+        });
+
+        addFooter();
+
+        const nomeArq = (empresa.replace(/[^a-z0-9]/gi,'_').substring(0,30) || 'empresa') + `_GHG_${anoBase}.pdf`;
+        doc.save(nomeArq);
+
+      } catch(e) {
+        console.error(e);
+        alert('Erro ao gerar PDF: ' + e.message);
+      } finally {
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
+      }
+    }, 50);
+  }
+
+  // ─── Tema ────────────────────────────────────────────────
+  const SUN  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const MOON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  function updateIcon() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.getElementById('themeIcon').innerHTML = isLight ? MOON : SUN;
+  }
+  function toggleTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    localStorage.setItem('cmTheme', isLight ? 'dark' : 'light');
+    updateIcon();
+  }
+  updateIcon();
+
+  // ─── Partículas flutuantes ────────────────────────────────
+  (function spawnParticles() {
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 6 + 3;
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*8}s;`;
+      pc.appendChild(p);
+    }
+  })();
+
+  // ─── Init ────────────────────────────────────────────────
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  (function() {
+    const d = loadResult();
+    if (!d) {
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('noData').style.display = 'block';
+      return;
+    }
+    renderGauge(d);
+    renderStatusMsg(d);
+    renderBreakdown(d);
+    renderComparacaoTotal(d);
+    renderEquiv(d);
+    renderAlavanca(d);
+    renderMetas(d);
+    renderComparacao(d);
+  })();
+</script>
+</body>
+</html>

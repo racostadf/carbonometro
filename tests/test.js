@@ -638,6 +638,277 @@ async function getInputValue(page, id) {
   }
 
   // ══════════════════════════════════════════════════════
+  // EMPRESARIAL.HTML — CTA + LOCALSTORAGE
+  // ══════════════════════════════════════════════════════
+  console.log('\n══════════════════════════════════════');
+  console.log('  empresarial.html — CTA + localStorage');
+  console.log('══════════════════════════════════════');
+  {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const jsErrors = [];
+    page.on('pageerror', e => jsErrors.push(e.message));
+    await page.goto(base + '/empresarial.html', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+
+    // C1. Botão #btnCalcular existe
+    console.log('\n  [C1] Botão #btnCalcular existe');
+    const btnCalcExists = await page.evaluate(() => !!document.getElementById('btnCalcular'));
+    tally(check(btnCalcExists, '#btnCalcular existe no DOM'));
+
+    // C2. Loading overlay existe e começa oculto
+    console.log('\n  [C2] Loading overlay');
+    const overlayHidden = await page.evaluate(() => {
+      const el = document.getElementById('calcOverlay');
+      return el && el.style.display !== 'flex';
+    });
+    tally(check(overlayHidden, 'calcOverlay existe e começa oculto'));
+
+    // C3. calcular() salva cm_empresa_result no localStorage
+    console.log('\n  [C3] calcular() salva dados no localStorage');
+    await setInput(page, 'num-func', 100);
+    await setInput(page, 'empresa-nome', 'Empresa Teste');
+    await setInput(page, 'eletric', 8000);
+    await page.waitForTimeout(200);
+
+    // Chama calcular() evitando o redirect real (patch setTimeout longo)
+    await page.evaluate(() => {
+      const origSetTimeout = window.setTimeout;
+      window.setTimeout = function(fn, delay, ...args) {
+        if (delay >= 2000) return origSetTimeout(() => {}, 99999);
+        return origSetTimeout(fn, delay, ...args);
+      };
+      calcular();
+    });
+    await page.waitForTimeout(300);
+
+    const saved = await page.evaluate(() => {
+      try { return JSON.parse(localStorage.getItem('cm_empresa_result')); } catch(e) { return null; }
+    });
+    tally(check(saved !== null, 'cm_empresa_result salvo no localStorage'));
+    tally(check(saved && typeof saved.total === 'number', 'Campo total é número'));
+    tally(check(saved && typeof saved.totalT === 'number', 'Campo totalT é número'));
+    tally(check(saved && typeof saved.intensity === 'number', 'Campo intensity é número'));
+    tally(check(saved && typeof saved.nFunc === 'number' && saved.nFunc === 100, 'nFunc correto (100)'));
+    tally(check(saved && saved.empresa === 'Empresa Teste', 'empresa correto'));
+    tally(check(saved && saved.emis && typeof saved.emis.s1 === 'number', 'emis.s1 presente'));
+    tally(check(saved && saved.emis && typeof saved.emis.s2 === 'number', 'emis.s2 presente'));
+    tally(check(saved && saved.emis && typeof saved.emis.s3 === 'number', 'emis.s3 presente'));
+    tally(check(saved && saved.pct && typeof saved.pct.s1 === 'number', 'pct.s1 presente'));
+    tally(check(saved && typeof saved.color === 'string', 'color presente'));
+    tally(check(saved && typeof saved.statusTxt === 'string' && saved.statusTxt.length > 0, 'statusTxt preenchido'));
+
+    // C4. Eletricidade > 0 → s2 > 0 no payload
+    tally(check(saved && saved.emis && saved.emis.s2 > 0, 'eletricidade (8000 kWh/mês) gera s2 > 0'));
+
+    // C5. Sem erros JS
+    console.log('\n  [C5] Erros de JavaScript');
+    tally(check(jsErrors.length === 0, jsErrors.length ? 'Erros: ' + jsErrors.join(' | ') : 'Sem erros JS'));
+
+    await page.screenshot({ path: path.join(screenshotsDir, 'empresa-cta.png') });
+    info('Screenshot: tests/screenshots/empresa-cta.png');
+    await page.close();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // EMPRESA-RESULTADO.HTML — RENDER + LEAD + PDF
+  // ══════════════════════════════════════════════════════
+  console.log('\n══════════════════════════════════════');
+  console.log('  empresa-resultado.html — Resultado');
+  console.log('══════════════════════════════════════');
+  {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const jsErrors = [];
+    page.on('pageerror', e => jsErrors.push(e.message));
+
+    // Seed com dados representativos (empresa de 50 func, ~180t no total)
+    const seedEmpresa = {
+      total: 180000, totalT: 180.0, intensity: 3.6, nFunc: 50,
+      empresa: 'Acme S.A.', setor: 'Serviços / Tecnologia', anoBase: '2024',
+      color: 'var(--ember)', statusTxt: 'Abaixo do benchmark',
+      emis: {
+        s1: 30000, s2: 60000, s3: 90000,
+        fleet: 20000, comb: 5000, ref: 3000, proc: 2000,
+        eletric: 60000,
+        comm: 40000, viag: 25000, frete: 10000, res: 8000, agua: 7000,
+      },
+      pct: { s1: 17, s2: 33, s3: 50 },
+      savedAt: new Date().toISOString(),
+    };
+
+    await page.goto(base + '/empresa-resultado.html', { waitUntil: 'networkidle' });
+    await page.evaluate((data) => {
+      localStorage.setItem('cm_empresa_result', JSON.stringify(data));
+    }, seedEmpresa);
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(600);
+
+    // D1. Gauge mostra 180,0
+    console.log('\n  [D1] Gauge mostra valor correto');
+    const gaugeVal = await page.evaluate(() => {
+      const el = document.getElementById('resMeterKg');
+      return el ? el.textContent.trim() : null;
+    });
+    info(`Gauge: "${gaugeVal}"`);
+    tally(check(gaugeVal === '180,0', `Gauge mostra "180,0" (got: "${gaugeVal}")`));
+
+    // D2. Status pill preenchido
+    console.log('\n  [D2] Status pill');
+    const pill = await page.evaluate(() => {
+      const el = document.getElementById('heroStatusPill');
+      return el ? el.textContent.trim() : '';
+    });
+    info(`Pill: "${pill}"`);
+    tally(check(pill === 'Abaixo do benchmark', 'Status pill correto'));
+
+    // D3. Hero mostra os 3 escopos
+    console.log('\n  [D3] Hero exibe Escopo 1, 2, 3');
+    const s1txt = await getText(page, 'heroS1');
+    const s2txt = await getText(page, 'heroS2');
+    const s3txt = await getText(page, 'heroS3');
+    info(`S1="${s1txt}" S2="${s2txt}" S3="${s3txt}"`);
+    tally(check(s1txt && s1txt.includes('30,0'), 'Hero Escopo 1 contém 30,0 t'));
+    tally(check(s2txt && s2txt.includes('60,0'), 'Hero Escopo 2 contém 60,0 t'));
+    tally(check(s3txt && s3txt.includes('90,0'), 'Hero Escopo 3 contém 90,0 t'));
+
+    // D4. Breakdown de escopos preenchido
+    console.log('\n  [D4] Breakdown de escopos');
+    const bdS1 = await getText(page, 'bd-val-s1');
+    const bdS2 = await getText(page, 'bd-val-s2');
+    const bdS3 = await getText(page, 'bd-val-s3');
+    info(`bd S1="${bdS1}" S2="${bdS2}" S3="${bdS3}"`);
+    tally(check(bdS1 && bdS1.includes('30,0'), 'Breakdown S1 correto'));
+    tally(check(bdS2 && bdS2.includes('60,0'), 'Breakdown S2 correto'));
+    tally(check(bdS3 && bdS3.includes('90,0'), 'Breakdown S3 correto'));
+
+    // D5. Sub-itens do breakdown preenchidos
+    console.log('\n  [D5] Sub-itens do breakdown');
+    const bdFleet = await getText(page, 'bd-fleet');
+    const bdEletric = await getText(page, 'bd-eletric');
+    const bdComm = await getText(page, 'bd-comm');
+    tally(check(bdFleet && bdFleet.includes('20,0'), `Frota: "${bdFleet}"`));
+    tally(check(bdEletric && bdEletric.includes('60,0'), `Eletricidade: "${bdEletric}"`));
+    tally(check(bdComm && bdComm.includes('40,0'), `Commuting: "${bdComm}"`));
+
+    // D6. Equivalências preenchidas (escala corporativa)
+    console.log('\n  [D6] Equivalências corporativas');
+    const arvores = await getText(page, 'equivArvores');
+    const voos    = await getText(page, 'equivVoos');
+    const casas   = await getText(page, 'equivCasas');
+    info(`Árvores=${arvores}, Voos=${voos}, Casas=${casas}`);
+    tally(check(arvores && parseInt(arvores.replace(/\D/g,'')) > 0, 'equivArvores > 0'));
+    tally(check(voos    && parseInt(voos.replace(/\D/g,''))    > 0, 'equivVoos > 0'));
+    tally(check(casas   && parseInt(casas.replace(/\D/g,''))   > 0, 'equivCasas > 0'));
+
+    // D7. Maior alavanca: deve ser Escopo 3 (90t)
+    console.log('\n  [D7] Maior alavanca = Escopo 3');
+    const alavancaCat = await getText(page, 'alavancaCat');
+    info(`Alavanca: "${alavancaCat}"`);
+    tally(check(alavancaCat && alavancaCat.includes('Escopo 3'), `Maior alavanca é Escopo 3 (got: "${alavancaCat}")`));
+
+    // D8. Metas SBTi preenchidas
+    console.log('\n  [D8] Metas SBTi');
+    const metaMsg = await getText(page, 'metaMsg');
+    info(`Meta: "${(metaMsg||'').substring(0,60)}..."`);
+    tally(check(metaMsg && metaMsg.length > 0, 'metaMsg preenchido'));
+
+    // D9. Comparação total (3 barras renderizadas)
+    console.log('\n  [D9] Comparação total');
+    const cmpUserVal = await getText(page, 'res-cmp-user-val');
+    info(`Comparação user: "${cmpUserVal}"`);
+    tally(check(cmpUserVal && cmpUserVal.includes('3,6'), `Intensidade 3,6 t/func na comparação (got: "${cmpUserVal}")`));
+
+    // D10. Fallback #noData oculto quando há dados
+    console.log('\n  [D10] noData oculto com dados presentes');
+    const noDataVisible = await page.evaluate(() => {
+      const el = document.getElementById('noData');
+      return el ? window.getComputedStyle(el).display !== 'none' : false;
+    });
+    tally(check(!noDataVisible, '#noData oculto quando há dados'));
+
+    // D11. #mainContent visível
+    const mainVisible = await page.evaluate(() => {
+      const el = document.getElementById('mainContent');
+      return el ? window.getComputedStyle(el).display !== 'none' : false;
+    });
+    tally(check(mainVisible, '#mainContent visível com dados'));
+
+    // D12. Submit lead → cm_leads_empresa
+    console.log('\n  [D12] Submit lead corporativo');
+    await page.fill('#leadNome', 'Maria Responsável');
+    await page.fill('#leadEmail', 'maria@empresa.com.br');
+    await page.click('form button[type="submit"]');
+    await page.waitForTimeout(300);
+
+    const leads = await page.evaluate(() => {
+      try { return JSON.parse(localStorage.getItem('cm_leads_empresa')); } catch(e) { return null; }
+    });
+    tally(check(leads && leads.length === 1, 'cm_leads_empresa tem 1 entrada'));
+    tally(check(leads && leads[0] && leads[0].nome === 'Maria Responsável', 'nome correto no lead empresa'));
+    tally(check(leads && leads[0] && leads[0].email === 'maria@empresa.com.br', 'email correto no lead empresa'));
+
+    // D13. Estado de obrigado visível
+    console.log('\n  [D13] Estado de obrigado');
+    const thanksVisible = await page.evaluate(() => {
+      const el = document.getElementById('leadThanks');
+      return el ? el.style.display !== 'none' : false;
+    });
+    tally(check(thanksVisible, 'Estado de obrigado visível após submit'));
+
+    // D14. #btnPdf existe (aparece pós-lead)
+    console.log('\n  [D14] Botão PDF corporativo');
+    const pdfBtn = await page.locator('#btnPdf').count();
+    tally(check(pdfBtn > 0, 'Botão #btnPdf presente'));
+
+    // D15. Fallback quando sem dados
+    console.log('\n  [D15] Fallback sem dados');
+    const pageFb = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const jsFbErrors = [];
+    pageFb.on('pageerror', e => jsFbErrors.push(e.message));
+    await pageFb.goto(base + '/empresa-resultado.html', { waitUntil: 'networkidle' });
+    await pageFb.evaluate(() => localStorage.removeItem('cm_empresa_result'));
+    await pageFb.reload({ waitUntil: 'networkidle' });
+    await pageFb.waitForTimeout(400);
+    const noDataShown = await pageFb.evaluate(() => {
+      const el = document.getElementById('noData');
+      return el ? window.getComputedStyle(el).display !== 'none' : false;
+    });
+    tally(check(noDataShown, '#noData visível sem dados'));
+    tally(check(jsFbErrors.length === 0, jsFbErrors.length ? 'Erros no fallback: ' + jsFbErrors.join(' | ') : 'Sem erros JS no fallback'));
+    await pageFb.close();
+
+    // D16. Sem erros JS
+    console.log('\n  [D16] Erros de JavaScript');
+    tally(check(jsErrors.length === 0, jsErrors.length ? 'Erros: ' + jsErrors.join(' | ') : 'Sem erros JS'));
+
+    await page.screenshot({ path: path.join(screenshotsDir, 'empresa-resultado.png') });
+    info('Screenshot: tests/screenshots/empresa-resultado.png');
+    await page.close();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // TEMA PERSISTE — EMPRESA-RESULTADO
+  // ══════════════════════════════════════════════════════
+  console.log('\n══════════════════════════════════════');
+  console.log('  Tema persiste — empresa-resultado');
+  console.log('══════════════════════════════════════');
+  {
+    const ctx = await browser.newContext();
+    const p1 = await ctx.newPage();
+    await p1.goto(base + '/index.html', { waitUntil: 'networkidle' });
+    await p1.locator('#themeToggle').click();
+    await p1.waitForTimeout(200);
+    await p1.close();
+
+    const p2 = await ctx.newPage();
+    await p2.goto(base + '/empresa-resultado.html', { waitUntil: 'networkidle' });
+    await p2.waitForTimeout(300);
+    const themeOnEmpRes = await p2.evaluate(() => document.documentElement.getAttribute('data-theme'));
+    tally(check(themeOnEmpRes === 'light', `Tema light mantido em empresa-resultado: "${themeOnEmpRes}"`));
+    await p2.close();
+    await ctx.close();
+  }
+
+  // ══════════════════════════════════════════════════════
   // RESULTADO FINAL
   // ══════════════════════════════════════════════════════
   console.log('\n══════════════════════════════════════');

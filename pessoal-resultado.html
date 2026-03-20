@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <script>(function(){var t=localStorage.getItem('cmTheme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultado — CarbonôMetro Brasil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,600;1,9..144,200;1,9..144,400&family=DM+Mono:wght@300;400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080f08;
+      --bg-2:      #0d1a0d;
+      --surface:   #122012;
+      --surface-2: #192d19;
+      --surface-3: #203920;
+      --border:        rgba(90, 155, 60, 0.12);
+      --border-bright: rgba(90, 155, 60, 0.28);
+      --green:       #5da83c;
+      --green-light: #7ec45e;
+      --green-pale:  #b8d8a0;
+      --amber:       #c8882e;
+      --amber-light: #dba84e;
+      --blue:        #6b9ac4;
+      --red:         #b85030;
+      --red-light:   #d4724e;
+      --text:   #dce8d0;
+      --text-2: #8aaa78;
+      --text-3: #4a6840;
+      --display: 'Fraunces', Georgia, serif;
+      --mono:    'DM Mono', 'Courier New', monospace;
+      --body:    'Lato', sans-serif;
+      --header-bg:  rgba(8, 15, 8, 0.90);
+      --grain-opacity: 0.45;
+    }
+
+    [data-theme="light"] {
+      --bg:        #f4f8f1;
+      --bg-2:      #eaf2e5;
+      --surface:   #e2ecdb;
+      --surface-2: #d4e5cb;
+      --surface-3: #c4d9b8;
+      --border:        rgba(40, 105, 18, 0.15);
+      --border-bright: rgba(40, 105, 18, 0.35);
+      --green:       #2a7818;
+      --green-light: #389a20;
+      --green-pale:  #1c5010;
+      --amber:       #9a5c08;
+      --amber-light: #c07818;
+      --blue:        #28599a;
+      --red:         #8c1e08;
+      --red-light:   #b83218;
+      --text:   #141e0e;
+      --text-2: #385828;
+      --text-3: #658050;
+      --header-bg:  rgba(244, 248, 241, 0.94);
+      --grain-opacity: 0.08;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999; opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 1.1rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--header-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-3); pointer-events: none;
+    }
+    .theme-toggle {
+      background: none; border: 1px solid var(--border-bright);
+      border-radius: 50%; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-3); flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover { color: var(--green-light); border-color: var(--green-light); }
+    .theme-toggle span { display: flex; line-height: 0; }
+    .back-link {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
+      color: var(--text-3); text-decoration: none; text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--green-light); }
+    .logo {
+      font-family: var(--display); font-size: 1.35rem; font-weight: 400;
+      color: var(--green-light); letter-spacing: -0.025em;
+      display: flex; align-items: center; gap: 0.55rem; text-decoration: none;
+    }
+    .logo em { font-style: italic; font-weight: 200; color: var(--text-3); }
+
+    /* ─── MAIN CONTENT ─── */
+    .page-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5.5rem 2rem 4rem;
+    }
+
+    /* ─── HERO SECTION ─── */
+    .res-hero {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 2rem 0 3rem; text-align: center;
+    }
+    .meter-wrap {
+      position: relative;
+      width: min(300px, 80vw); height: min(300px, 80vw);
+      margin-bottom: 1.5rem;
+    }
+    .meter-svg { width: 100%; height: 100%; }
+    .meter-track { fill: none; stroke: var(--surface-3); stroke-width: 14; }
+    .meter-fill {
+      fill: none; stroke: var(--green); stroke-width: 14;
+      stroke-linecap: round;
+      transform-origin: center;
+      transform: rotate(-90deg);
+      transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1), stroke 0.4s;
+    }
+    .meter-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.15rem;
+    }
+    .meter-kg {
+      font-family: var(--display); font-size: 2.6rem; font-weight: 400;
+      letter-spacing: -0.03em; line-height: 1; transition: color 0.4s;
+    }
+    .meter-unit {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
+      color: var(--text-3); text-transform: uppercase;
+    }
+    .meter-status {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em;
+      color: var(--text-2); text-transform: uppercase; margin-top: 0.2rem;
+    }
+    .benchmarks {
+      display: flex; justify-content: space-between; width: 100%;
+      margin-top: 0.5rem;
+    }
+    .bm {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em;
+      color: var(--text-3); text-align: center;
+    }
+    .bm-br { color: var(--amber); }
+    .bm-world { color: var(--blue); }
+
+    .res-title {
+      font-family: var(--display); font-size: 2rem; font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .res-title em { font-style: italic; font-weight: 200; color: var(--green-light); }
+
+    /* ─── INSIGHTS GRID ─── */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 640px) {
+      .insights-grid { grid-template-columns: 1fr; }
+    }
+
+    .ins-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.6rem;
+    }
+    .ins-card-title {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-3); margin-bottom: 1rem;
+    }
+
+    /* Equivalências */
+    .equiv-item {
+      display: flex; align-items: baseline; gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .equiv-val {
+      font-family: var(--display); font-size: 1.7rem; font-weight: 400;
+      color: var(--green-light); line-height: 1;
+    }
+    .equiv-label {
+      font-size: 0.82rem; color: var(--text-2);
+    }
+
+    /* Maior alavanca */
+    .alavanca-cat {
+      font-family: var(--display); font-size: 1.4rem; font-weight: 400;
+      color: var(--amber-light); margin-bottom: 0.3rem;
+    }
+    .alavanca-saving {
+      font-size: 0.85rem; color: var(--text-2); line-height: 1.5;
+    }
+    .alavanca-saving strong { color: var(--text); }
+
+    /* Metas climáticas */
+    .meta-bar-wrap {
+      position: relative; height: 8px; background: var(--surface-3);
+      border-radius: 4px; margin: 0.75rem 0;
+    }
+    .meta-bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width 1s ease;
+    }
+    .meta-markers {
+      display: flex; justify-content: space-between;
+      font-family: var(--mono); font-size: 0.58rem;
+      color: var(--text-3); letter-spacing: 0.06em; margin-top: 0.3rem;
+    }
+    .meta-msg {
+      font-size: 0.82rem; color: var(--text-2); margin-top: 0.75rem; line-height: 1.5;
+    }
+
+    /* Comparação por categoria */
+    .comp-cat-row {
+      margin-bottom: 0.9rem;
+    }
+    .comp-cat-label {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-3); margin-bottom: 0.3rem;
+    }
+    .comp-bars { display: flex; flex-direction: column; gap: 4px; }
+    .comp-bar-row {
+      display: grid; grid-template-columns: 45px 1fr 55px;
+      align-items: center; gap: 0.5rem;
+    }
+    .comp-bar-who {
+      font-family: var(--mono); font-size: 0.56rem;
+      color: var(--text-3); letter-spacing: 0.06em;
+    }
+    .comp-bar-bg {
+      background: var(--surface-3); border-radius: 3px; height: 7px; overflow: hidden;
+    }
+    .comp-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .comp-bar-val {
+      font-family: var(--mono); font-size: 0.58rem;
+      color: var(--text-2); text-align: right;
+    }
+
+    /* ─── LEAD CAPTURE ─── */
+    .lead-card {
+      background: var(--surface);
+      border: 1px solid var(--border-bright);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .lead-title {
+      font-family: var(--display); font-size: 1.4rem; font-weight: 400;
+      margin-bottom: 0.4rem;
+    }
+    .lead-sub { font-size: 0.85rem; color: var(--text-2); margin-bottom: 1.5rem; }
+    .lead-form {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;
+    }
+    .lead-form input {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 1rem;
+      color: var(--text); font-family: var(--body); font-size: 0.9rem;
+      min-width: 200px; flex: 1;
+      outline: none; transition: border-color 0.2s;
+    }
+    .lead-form input:focus { border-color: var(--green); }
+    .lead-form button {
+      background: var(--green); color: #fff; border: none;
+      border-radius: 8px; padding: 0.65rem 1.6rem;
+      font-family: var(--body); font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .lead-form button:hover { background: var(--green-light); }
+    .lead-thanks {
+      display: none; color: var(--green-light);
+      font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.08em;
+    }
+
+    /* ─── PDF BUTTON ─── */
+    .pdf-wrap { text-align: center; margin-bottom: 3rem; }
+    .btn-pdf {
+      background: none; border: 1px solid var(--border-bright);
+      border-radius: 8px; padding: 0.7rem 2rem;
+      color: var(--text-2); font-family: var(--body); font-size: 0.9rem;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+      display: inline-flex; align-items: center; gap: 0.6rem;
+    }
+    .btn-pdf:hover { color: var(--green-light); border-color: var(--green-light); }
+
+    /* ─── FALLBACK ─── */
+    .no-data {
+      display: none;
+      text-align: center; padding: 5rem 2rem;
+    }
+    .no-data p { color: var(--text-2); margin-bottom: 1.5rem; }
+    .no-data a {
+      color: var(--green-light); font-family: var(--mono);
+      font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none;
+    }
+    .no-data a:hover { color: var(--green); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border); padding: 1.5rem 2rem;
+      text-align: center; font-family: var(--mono); font-size: 0.6rem;
+      letter-spacing: 0.08em; color: var(--text-3); text-transform: uppercase;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 0.9rem 1.2rem; }
+      .page-wrap { padding: 5rem 1rem 3rem; }
+      .meter-wrap { width: min(260px, 78vw); height: min(260px, 78vw); }
+      .meter-kg { font-size: 2rem; }
+      .res-title { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <a href="pessoal.html" class="back-link" id="backLink">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="12.5" stroke="currentColor" stroke-opacity="0.2" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
+        <circle cx="16" cy="16" r="12.5" style="stroke:var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="52.36 26.18" transform="rotate(150 16 16)"/>
+        <path d="M16 23 C11.5 19.5 11 13 16 9 C21 13 20.5 19.5 16 23Z" style="stroke:var(--green-light)" fill="none" stroke-width="1.3" stroke-linejoin="round" transform="rotate(-45 16 16)"/>
+        <circle cx="16" cy="16" r="1.5" style="fill:var(--green)"/>
+      </svg>
+      CarbonôMetro <em>Brasil</em>
+    </div>
+  </div>
+  <span class="header-center">Resultado</span>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
+    <span id="themeIcon"></span>
+  </button>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<div class="page-wrap" id="mainContent">
+
+  <!-- Hero -->
+  <div class="res-hero">
+    <div style="position:relative;">
+      <div class="meter-wrap">
+        <svg class="meter-svg" viewBox="0 0 290 290">
+          <circle class="meter-track" cx="145" cy="145" r="118"/>
+          <circle class="meter-fill" id="resMeterFill" cx="145" cy="145" r="118"
+                  stroke-dasharray="741.4" stroke-dashoffset="741.4"/>
+        </svg>
+        <div class="meter-center">
+          <div class="meter-kg" id="resMeterKg">0,0</div>
+          <div class="meter-unit">tCO₂ / ANO</div>
+          <div class="meter-status" id="resMeterStatus">—</div>
+        </div>
+      </div>
+      <div class="benchmarks" style="width:min(300px,80vw);">
+        <div class="bm bm-br">▲ BR<br>2,2 t</div>
+        <div class="bm bm-world" style="text-align:right;">▲ Mundo<br>4,7 t</div>
+      </div>
+    </div>
+
+    <h1 class="res-title" id="resTitle">Sua <em>pegada</em> calculada</h1>
+  </div>
+
+  <!-- Insights Grid -->
+  <div class="insights-grid" id="insightsGrid">
+
+    <!-- Card 1: Equivalências -->
+    <div class="ins-card">
+      <div class="ins-card-title">Equivalências</div>
+      <div id="equivContent">
+        <div class="equiv-item">
+          <span class="equiv-val" id="equivArvores">—</span>
+          <span class="equiv-label">árvores necessárias para absorver em 1 ano</span>
+        </div>
+        <div class="equiv-item">
+          <span class="equiv-val" id="equivVoos">—</span>
+          <span class="equiv-label">voos SP→RIO equivalentes</span>
+        </div>
+        <div class="equiv-item">
+          <span class="equiv-val" id="equivBanhos">—</span>
+          <span class="equiv-label">meses de banho diário equivalentes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Maior alavanca -->
+    <div class="ins-card">
+      <div class="ins-card-title">Maior alavanca</div>
+      <div id="alavancaContent">
+        <div class="alavanca-cat" id="alavancaCat">—</div>
+        <div class="alavanca-saving" id="alavancaSaving"></div>
+      </div>
+    </div>
+
+    <!-- Card 3: Metas climáticas -->
+    <div class="ins-card">
+      <div class="ins-card-title">Metas climáticas</div>
+      <div id="metasContent">
+        <div class="meta-bar-wrap">
+          <div class="meta-bar-fill" id="metaBarFill" style="width:0%;background:var(--green)"></div>
+        </div>
+        <div class="meta-markers">
+          <span>0</span>
+          <span style="color:var(--green)">1,5°C (2,0t)</span>
+          <span style="color:var(--amber)">2°C (3,3t)</span>
+          <span>6t+</span>
+        </div>
+        <div class="meta-msg" id="metaMsg"></div>
+      </div>
+    </div>
+
+    <!-- Card 4: Comparação por categoria -->
+    <div class="ins-card">
+      <div class="ins-card-title">Você vs Média BR</div>
+      <div id="comparacaoContent">
+        <div class="comp-cat-row" id="compT"></div>
+        <div class="comp-cat-row" id="compE"></div>
+        <div class="comp-cat-row" id="compA"></div>
+        <div class="comp-cat-row" id="compC"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Lead Capture -->
+  <div class="lead-card">
+    <div class="lead-title">Receba seu relatório completo</div>
+    <div class="lead-sub">Deixe seu nome e e-mail para receber dicas personalizadas baseadas na sua pegada.</div>
+    <div id="leadFormWrap">
+      <form class="lead-form" onsubmit="submitLead(event)">
+        <input type="text" id="leadNome" placeholder="Seu nome" required autocomplete="name">
+        <input type="email" id="leadEmail" placeholder="Seu e-mail" required autocomplete="email">
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+    <div class="lead-thanks" id="leadThanks">
+      Obrigado! Seus dados foram salvos.
+    </div>
+  </div>
+
+  <!-- PDF Button -->
+  <div class="pdf-wrap">
+    <button class="btn-pdf" id="btnPdf" onclick="generatePDF()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <polyline points="9 15 12 18 15 15"/>
+      </svg>
+      Baixar PDF
+    </button>
+  </div>
+
+</div>
+
+<!-- Fallback sem dados -->
+<div class="no-data" id="noData">
+  <p>Nenhum dado encontrado. Preencha a calculadora para ver seu resultado.</p>
+  <a href="pessoal.html">← Voltar para a calculadora</a>
+</div>
+
+<footer>
+  CarbonôMetro Brasil &nbsp;·&nbsp; Fatores de emissão baseados em dados MCTI, SEEG e IPCC AR6 &nbsp;·&nbsp; Estimativas educacionais
+</footer>
+
+<script>
+  // ─── Dados ───────────────────────────────────────────────
+  function loadResult() {
+    try {
+      const raw = localStorage.getItem('cm_pessoal_result');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch(e) { return null; }
+  }
+
+  // ─── Gauge ───────────────────────────────────────────────
+  function renderGauge(d) {
+    const circ  = 2 * Math.PI * 118; // r=118 → 741.4
+    const maxKg = 20000;
+    const pct   = Math.min(d.total / maxKg, 1);
+    const offset= circ * (1 - pct);
+
+    const fill = document.getElementById('resMeterFill');
+    fill.style.strokeDashoffset = offset;
+    fill.style.strokeDasharray  = circ;
+    fill.style.stroke = d.color;
+
+    const kg = document.getElementById('resMeterKg');
+    kg.textContent = d.totalT.toFixed(1).replace('.', ',');
+    kg.style.color = d.color;
+
+    document.getElementById('resMeterStatus').textContent = d.statusTxt;
+
+    document.getElementById('resTitle').innerHTML =
+      '<em>' + d.totalT.toFixed(1).replace('.', ',') + ' t CO₂</em> / ano';
+  }
+
+  // ─── Equivalências ───────────────────────────────────────
+  function renderEquiv(d) {
+    const kg = d.total;
+    const arvores = Math.round(kg / 21);   // ~21 kg absorvidos/árvore/ano
+    const voos    = Math.round(kg / 90);   // ~90 kg SP→RIO
+    const banhos  = Math.round(kg / 3.6);  // ~3.6 kg/mês de banho diário
+
+    document.getElementById('equivArvores').textContent = arvores.toLocaleString('pt-BR');
+    document.getElementById('equivVoos').textContent    = voos.toLocaleString('pt-BR');
+    document.getElementById('equivBanhos').textContent  = banhos.toLocaleString('pt-BR');
+  }
+
+  // ─── Maior Alavanca ──────────────────────────────────────
+  function renderAlavanca(d) {
+    const cats = [
+      { key: 't', label: 'Transporte',  val: d.emis.t },
+      { key: 'e', label: 'Energia',     val: d.emis.e },
+      { key: 'a', label: 'Alimentação', val: d.emis.a },
+      { key: 'c', label: 'Consumo',     val: d.emis.c },
+    ];
+    const max = cats.reduce((a, b) => b.val > a.val ? b : a);
+    const saving20 = Math.round(max.val * 0.20);
+
+    document.getElementById('alavancaCat').textContent = max.label;
+    document.getElementById('alavancaSaving').innerHTML =
+      'Representa <strong>' + d.pct[max.key] + '%</strong> da sua pegada.<br>' +
+      'Reduzir 20% economizaria <strong>' + saving20.toLocaleString('pt-BR') + ' kg CO₂/ano</strong>.';
+  }
+
+  // ─── Metas Climáticas ────────────────────────────────────
+  function renderMetas(d) {
+    // Barra: max = 6000 kg (6t) para o range visual
+    const maxBar = 6000;
+    const pct    = Math.min(d.total / maxBar * 100, 100);
+    const bar    = document.getElementById('metaBarFill');
+    bar.style.width      = pct + '%';
+    bar.style.background = d.color;
+
+    let msg;
+    if (d.total <= 2000) {
+      msg = 'Excelente! Você está dentro da meta de 1,5°C (2,0 t/ano). Continue assim!';
+    } else if (d.total <= 3300) {
+      msg = 'Bom! Você está entre a meta de 1,5°C e 2°C. Pequenas reduções te levariam à meta mais ambiciosa.';
+    } else if (d.total <= 4700) {
+      msg = 'Acima das metas climáticas, mas abaixo da média mundial. Reduzir ' +
+            Math.round((d.total - 3300) / 1000 * 10) / 10 + ' t levaria à meta de 2°C.';
+    } else {
+      msg = 'Significativamente acima das metas climáticas. Reduções em transporte e alimentação têm maior impacto.';
+    }
+    document.getElementById('metaMsg').textContent = msg;
+  }
+
+  // ─── Comparação por Categoria ────────────────────────────
+  function renderComparacao(d) {
+    const BR = { t: 1000, e: 400, a: 1400, c: 500 };
+    const cats = [
+      { id: 'compT', label: 'Transporte',  val: d.emis.t, br: BR.t, color: 'var(--green)' },
+      { id: 'compE', label: 'Energia',     val: d.emis.e, br: BR.e, color: 'var(--amber)' },
+      { id: 'compA', label: 'Alimentação', val: d.emis.a, br: BR.a, color: 'var(--blue)' },
+      { id: 'compC', label: 'Consumo',     val: d.emis.c, br: BR.c, color: 'var(--red-light)' },
+    ];
+
+    cats.forEach(cat => {
+      const maxVal = Math.max(cat.val, cat.br, 100);
+      const pctYou = Math.min(cat.val / maxVal * 100, 100);
+      const pctBR  = Math.min(cat.br  / maxVal * 100, 100);
+      const fmtKg  = (n) => (n / 1000).toFixed(1).replace('.', ',') + ' t';
+      const el = document.getElementById(cat.id);
+      el.innerHTML = `
+        <div class="comp-cat-label">${cat.label}</div>
+        <div class="comp-bars">
+          <div class="comp-bar-row">
+            <span class="comp-bar-who">Você</span>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${pctYou}%;background:${cat.color}"></div></div>
+            <span class="comp-bar-val">${fmtKg(cat.val)}</span>
+          </div>
+          <div class="comp-bar-row">
+            <span class="comp-bar-who">BR</span>
+            <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${pctBR}%;background:var(--surface-3)"></div></div>
+            <span class="comp-bar-val">${fmtKg(cat.br)}</span>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // ─── Captura de Lead ─────────────────────────────────────
+  function submitLead(e) {
+    e.preventDefault();
+    const nome  = document.getElementById('leadNome').value.trim();
+    const email = document.getElementById('leadEmail').value.trim();
+    if (!nome || !email) return;
+
+    const leads = JSON.parse(localStorage.getItem('cm_leads') || '[]');
+    leads.push({ nome, email, savedAt: new Date().toISOString() });
+    localStorage.setItem('cm_leads', JSON.stringify(leads));
+
+    document.getElementById('leadFormWrap').style.display = 'none';
+    const thanks = document.getElementById('leadThanks');
+    thanks.style.display = 'block';
+  }
+
+  // ─── Gerar PDF ───────────────────────────────────────────
+  function generatePDF() {
+    if (!window.jspdf) {
+      alert('Biblioteca PDF não carregada. Verifique sua conexão e tente novamente.');
+      return;
+    }
+
+    const d = loadResult();
+    if (!d) { alert('Nenhum dado encontrado.'); return; }
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const W = 210, H = 297;
+      const ML = 15, MR = 15, MT = 12;
+      const CW = W - ML - MR;
+      let y = MT;
+
+      // Paleta
+      const INK    = [20,  30,  20];
+      const INK2   = [90, 105,  85];
+      const INK3   = [150, 160, 145];
+      const GREEN  = [60, 140,  35];
+      const AMBER  = [180, 110,  20];
+      const RED    = [170,  55,  30];
+      const BLUE   = [50, 110, 175];
+      const BGGRAY = [245, 247, 244];
+      const BGDARK = [30,  45,  28];
+      const WHITE  = [255, 255, 255];
+
+      const rgb  = (c) => doc.setTextColor(...c);
+      const fill = (c) => doc.setFillColor(...c);
+      const draw = (c) => doc.setDrawColor(...c);
+      const lw   = (n) => doc.setLineWidth(n);
+      const font = (sz, st='normal') => { doc.setFontSize(sz); doc.setFont('helvetica', st); };
+      const txt  = (s, x, yy, opts) => doc.text(s, x, yy, opts || {});
+      const rect = (x, yy, w, h, s='F') => doc.rect(x, yy, w, h, s);
+      const hline = (yy, c=INK3, th=0.2) => {
+        lw(th); draw(c); doc.line(ML, yy, W-MR, yy);
+      };
+      const fmtN  = (n) => (n||0).toLocaleString('pt-BR');
+      const fmtT1 = (n) => ((n||0)/1000).toFixed(1).replace('.', ',');
+      const today = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+      // Color for total
+      const totalKg = d.total;
+      const totColor = totalKg < 2200 ? GREEN : totalKg < 4700 ? AMBER : RED;
+
+      // Footer
+      const addFooter = () => {
+        lw(0.2); draw(INK3);
+        doc.line(ML, H-10, W-MR, H-10);
+        font(6); rgb(INK3);
+        txt('CarbonôMetro Pessoal  ·  MCTI 2023  ·  SEEG  ·  IPCC AR6', ML, H-6);
+        txt(`Emitido em ${today}`, W-MR, H-6, { align: 'right' });
+      };
+
+      // ── HEADER DARK ──
+      fill(BGDARK); rect(0, 0, W, 42);
+      fill(GREEN);  rect(0, 0, 4, 42);
+      font(7, 'normal'); rgb([130, 180, 100]);
+      txt('CARBONÔMETRO PESSOAL  ·  CALCULADORA INDIVIDUAL', ML+6, 10);
+      font(16, 'bold'); rgb([225, 245, 210]);
+      txt('Relatório de Pegada de Carbono', ML+6, 22);
+      font(8, 'normal'); rgb([150, 190, 130]);
+      txt(`Total: ${d.totalT.toFixed(1).replace('.', ',')} tCO₂ / ano  ·  ${d.statusTxt}`, ML+6, 31);
+      font(7, 'normal'); rgb([90, 130, 75]);
+      txt(`Emitido em: ${today}`, ML+6, 38);
+      y = 52;
+
+      // ── SEÇÃO 1: BREAKDOWN ──
+      font(7, 'bold'); rgb(INK2);
+      txt('1. BREAKDOWN POR CATEGORIA', ML, y);
+      hline(y+2, GREEN, 0.4);
+      y += 7;
+
+      const colX = [ML, ML+60, ML+100, ML+140];
+      fill(BGDARK); rect(ML, y, CW, 8);
+      font(6.5, 'bold'); rgb([200, 230, 185]);
+      txt('Categoria',       colX[0]+2, y+5.5);
+      txt('kg CO₂ / ano',    colX[1]+2, y+5.5);
+      txt('tCO₂ / ano',      colX[2]+2, y+5.5);
+      txt('% do total',      colX[3]+2, y+5.5);
+      y += 8;
+
+      const rows = [
+        { label: 'Transporte',  val: d.emis.t, color: RED   },
+        { label: 'Energia',     val: d.emis.e, color: AMBER },
+        { label: 'Alimentação', val: d.emis.a, color: BLUE  },
+        { label: 'Consumo',     val: d.emis.c, color: GREEN },
+      ];
+
+      rows.forEach((row, i) => {
+        if (i % 2 === 0) { fill(BGGRAY); rect(ML, y, CW, 8); }
+        font(7, 'normal'); rgb(INK);
+        txt(row.label, colX[0]+2, y+5.5);
+        rgb(row.color);
+        txt(fmtN(row.val), colX[1]+2, y+5.5);
+        txt(fmtT1(row.val), colX[2]+2, y+5.5);
+        txt((d.pct[Object.keys(d.pct)[i]] || 0) + '%', colX[3]+2, y+5.5);
+        y += 8;
+      });
+
+      // Total row
+      fill(BGDARK); rect(ML, y, CW, 9);
+      font(7.5, 'bold'); rgb([200, 230, 185]);
+      txt('TOTAL', colX[0]+2, y+6);
+      rgb(totColor);
+      txt(fmtN(d.total), colX[1]+2, y+6);
+      txt(d.totalT.toFixed(1).replace('.', ','), colX[2]+2, y+6);
+      txt('100%', colX[3]+2, y+6);
+      y += 16;
+
+      // ── SEÇÃO 2: MAIOR ALAVANCA ──
+      font(7, 'bold'); rgb(INK2);
+      txt('2. MAIOR ALAVANCA DE REDUÇÃO', ML, y);
+      hline(y+2, GREEN, 0.4);
+      y += 7;
+
+      const cats = [
+        { key: 't', label: 'Transporte',  val: d.emis.t },
+        { key: 'e', label: 'Energia',     val: d.emis.e },
+        { key: 'a', label: 'Alimentação', val: d.emis.a },
+        { key: 'c', label: 'Consumo',     val: d.emis.c },
+      ];
+      const maxCat = cats.reduce((a, b) => b.val > a.val ? b : a);
+      const saving = Math.round(maxCat.val * 0.20);
+
+      fill(BGGRAY); rect(ML, y, CW, 22);
+      font(9, 'bold'); rgb(AMBER);
+      txt(maxCat.label, ML+4, y+7);
+      font(7, 'normal'); rgb(INK);
+      txt(`Responsável por ${d.pct[maxCat.key]}% da sua pegada total (${fmtN(maxCat.val)} kg CO₂/ano).`, ML+4, y+14);
+      txt(`Reduzir 20% representaria uma economia de ${fmtN(saving)} kg CO₂/ano.`, ML+4, y+20);
+      y += 30;
+
+      // ── SEÇÃO 3: METAS CLIMÁTICAS ──
+      font(7, 'bold'); rgb(INK2);
+      txt('3. POSIÇÃO VS. METAS CLIMÁTICAS', ML, y);
+      hline(y+2, GREEN, 0.4);
+      y += 8;
+
+      font(7, 'normal'); rgb(INK);
+      const metaRows = [
+        { label: 'Meta 1,5°C (IPCC)',   target: 2000, unit: '2,0 t/ano' },
+        { label: 'Meta 2°C (IPCC)',      target: 3300, unit: '3,3 t/ano' },
+        { label: 'Média Brasileira',     target: 2200, unit: '2,2 t/ano' },
+        { label: 'Média Mundial',        target: 4700, unit: '4,7 t/ano' },
+        { label: 'Sua pegada',           target: d.total, unit: d.totalT.toFixed(1).replace('.', ',') + ' t/ano' },
+      ];
+
+      metaRows.forEach((row, i) => {
+        if (i % 2 === 0) { fill(BGGRAY); rect(ML, y, CW, 8); }
+        font(7, 'normal'); rgb(INK);
+        txt(row.label, ML+2, y+5.5);
+        const diff = d.total - row.target;
+        const diffTxt = i < 4 ? (diff > 0 ? '+' + fmtN(diff) + ' kg acima' : fmtN(Math.abs(diff)) + ' kg abaixo') : '';
+        if (diffTxt) { rgb(diff > 0 ? RED : GREEN); txt(diffTxt, colX[2], y+5.5); }
+        rgb(INK2);
+        txt(row.unit, W-MR-2, y+5.5, { align: 'right' });
+        y += 8;
+      });
+
+      y += 5;
+      addFooter();
+
+      doc.save('carbonometro_pessoal.pdf');
+    } catch (e) {
+      console.error(e);
+      alert('Erro ao gerar PDF: ' + e.message);
+    }
+  }
+
+  // ─── Tema ────────────────────────────────────────────────
+  const SUN  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const MOON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  function updateIcon() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.getElementById('themeIcon').innerHTML = isLight ? MOON : SUN;
+  }
+  function toggleTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    localStorage.setItem('cmTheme', isLight ? 'dark' : 'light');
+    updateIcon();
+  }
+  updateIcon();
+
+  // ─── Init ────────────────────────────────────────────────
+  (function() {
+    const d = loadResult();
+    if (!d) {
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('noData').style.display = 'block';
+      return;
+    }
+    renderGauge(d);
+    renderEquiv(d);
+    renderAlavanca(d);
+    renderMetas(d);
+    renderComparacao(d);
+  })();
+</script>
+</body>
+</html>

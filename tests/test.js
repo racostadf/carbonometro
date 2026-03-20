@@ -421,6 +421,190 @@ async function getInputValue(page, id) {
   }
 
   // ══════════════════════════════════════════════════════
+  // PESSOAL.HTML — CTA + LOCALSTORAGE
+  // ══════════════════════════════════════════════════════
+  console.log('\n══════════════════════════════════════');
+  console.log('  pessoal.html — CTA + localStorage');
+  console.log('══════════════════════════════════════');
+  {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const jsErrors = [];
+    page.on('pageerror', e => jsErrors.push(e.message));
+    await page.goto(base + '/pessoal.html', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+
+    // A. #btnCalcular existe no DOM
+    console.log('\n  [A1] Botão #btnCalcular existe');
+    const btnExists = await page.evaluate(() => !!document.getElementById('btnCalcular'));
+    tally(check(btnExists, '#btnCalcular existe no DOM'));
+
+    // A. Clicar no botão salva cm_pessoal_result (síncrono, antes do redirect 2.5s)
+    console.log('\n  [A2] Click salva cm_pessoal_result no localStorage');
+    // Configura alguns valores antes de clicar
+    await setSlider(page, 's-carro', 120);
+    await setSelect(page, 'tipo-carro', '0.171');
+    await setSlider(page, 's-aviao', 2);
+    await page.waitForTimeout(200);
+
+    // Intercepta o click: salva e impede o redirect
+    await page.evaluate(() => {
+      window._origLocation = window.location.href;
+      // Evita redirect durante o teste sobrescrevendo temporariamente
+      const origAssign = Object.getOwnPropertyDescriptor(window.location, 'href');
+      Object.defineProperty(window, '_redirectCalled', { value: false, writable: true });
+    });
+
+    // Chama saveAndRedirect() via JS para capturar resultado sem navegar
+    await page.evaluate(() => {
+      // Patch para evitar redirect real durante o teste
+      const origSetTimeout = window.setTimeout;
+      window.setTimeout = function(fn, delay, ...args) {
+        if (delay >= 2000) {
+          // Substitui o redirect por um noop
+          return origSetTimeout(() => {}, 99999);
+        }
+        return origSetTimeout(fn, delay, ...args);
+      };
+      saveAndRedirect();
+    });
+    await page.waitForTimeout(300);
+
+    const saved = await page.evaluate(() => {
+      try { return JSON.parse(localStorage.getItem('cm_pessoal_result')); } catch(e) { return null; }
+    });
+    tally(check(saved !== null, 'cm_pessoal_result salvo no localStorage'));
+
+    // Campos obrigatórios
+    tally(check(saved && typeof saved.total === 'number', 'Campo total é número'));
+    tally(check(saved && typeof saved.totalT === 'number', 'Campo totalT é número'));
+    tally(check(saved && saved.emis && typeof saved.emis.t === 'number', 'emis.t presente'));
+    tally(check(saved && saved.emis && typeof saved.emis.e === 'number', 'emis.e presente'));
+    tally(check(saved && saved.emis && typeof saved.emis.a === 'number', 'emis.a presente'));
+    tally(check(saved && saved.emis && typeof saved.emis.c === 'number', 'emis.c presente'));
+    tally(check(saved && typeof saved.color === 'string' && saved.color.startsWith('#'), 'color é hex válido'));
+    tally(check(saved && typeof saved.statusTxt === 'string' && saved.statusTxt.length > 0, 'statusTxt preenchido'));
+    tally(check(saved && saved.inputs && typeof saved.inputs.carro === 'number', 'inputs.carro presente'));
+
+    console.log('\n  [A3] Erros de JavaScript');
+    tally(check(jsErrors.length === 0, jsErrors.length ? 'Erros: ' + jsErrors.join(' | ') : 'Sem erros JS'));
+
+    await page.screenshot({ path: path.join(screenshotsDir, 'pessoal-cta.png') });
+    info('Screenshot: tests/screenshots/pessoal-cta.png');
+    await page.close();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // PESSOAL-RESULTADO.HTML — RENDER + LEAD + PDF
+  // ══════════════════════════════════════════════════════
+  console.log('\n══════════════════════════════════════');
+  console.log('  pessoal-resultado.html — Resultado');
+  console.log('══════════════════════════════════════');
+  {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const jsErrors = [];
+    page.on('pageerror', e => jsErrors.push(e.message));
+
+    // Seed localStorage com dados de teste
+    const seedData = {
+      total: 3140, totalT: 3.14,
+      emis: { t: 980, e: 420, a: 1340, c: 400 },
+      pct:  { t: 31,  e: 13,  a: 43,   c: 13  },
+      color: '#c8882e',
+      statusTxt: 'Entre Brasil e média mundial',
+      inputs: { carro: 120, tipoCarro: '0.171', moto: 0, aviao: 2, onibus: 0,
+                luz: 150, gas: 5, pessoas: '4', solar: '1', dieta: '2400',
+                local: 0, desp: 1.0, roupas: 5, eletro: 1, consumo: '550', delivery: '40' },
+      savedAt: new Date().toISOString(),
+    };
+
+    await page.goto(base + '/pessoal-resultado.html', { waitUntil: 'networkidle' });
+    await page.evaluate((data) => {
+      localStorage.setItem('cm_pessoal_result', JSON.stringify(data));
+    }, seedData);
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(600);
+
+    // B1. Gauge mostra valor correto
+    console.log('\n  [B1] Gauge mostra valor correto');
+    const gaugeVal = await page.evaluate(() => {
+      const el = document.getElementById('resMeterKg');
+      return el ? el.textContent.trim() : null;
+    });
+    info(`Gauge: "${gaugeVal}"`);
+    tally(check(gaugeVal === '3,1', `Gauge mostra "3,1" (got: "${gaugeVal}")`));
+
+    // B2. Status text correto
+    console.log('\n  [B2] Status text');
+    const statusVal = await page.evaluate(() => {
+      const el = document.getElementById('resMeterStatus');
+      return el ? el.textContent.trim() : null;
+    });
+    info(`Status: "${statusVal}"`);
+    tally(check(statusVal === 'Entre Brasil e média mundial', `Status correto`));
+
+    // B3. Equivalências contém "árvores"
+    console.log('\n  [B3] Equivalências preenchidas');
+    const equivText = await page.evaluate(() => {
+      const el = document.getElementById('equivContent');
+      return el ? el.textContent : '';
+    });
+    tally(check(equivText.includes('árvores'), 'Equivalências contém "árvores"'));
+
+    // B4. Maior alavanca renderizada
+    console.log('\n  [B4] Maior alavanca');
+    const alavancaCat = await page.evaluate(() => {
+      const el = document.getElementById('alavancaCat');
+      return el ? el.textContent.trim() : '';
+    });
+    info(`Alavanca: "${alavancaCat}"`);
+    tally(check(alavancaCat.length > 0, 'Alavanca não vazia'));
+
+    // B5. Metas climáticas
+    console.log('\n  [B5] Metas climáticas');
+    const metaMsg = await page.evaluate(() => {
+      const el = document.getElementById('metaMsg');
+      return el ? el.textContent.trim() : '';
+    });
+    info(`Meta msg: "${metaMsg.substring(0,60)}..."`);
+    tally(check(metaMsg.length > 0, 'Mensagem de meta preenchida'));
+
+    // B6. Submit lead → cm_leads com entrada correta
+    console.log('\n  [B6] Submit lead');
+    await page.fill('#leadNome', 'Teste Silva');
+    await page.fill('#leadEmail', 'teste@example.com');
+    await page.click('form button[type="submit"]');
+    await page.waitForTimeout(300);
+
+    const leads = await page.evaluate(() => {
+      try { return JSON.parse(localStorage.getItem('cm_leads')); } catch(e) { return null; }
+    });
+    tally(check(leads && leads.length === 1, 'cm_leads tem 1 entrada'));
+    tally(check(leads && leads[0] && leads[0].nome === 'Teste Silva', 'nome correto no lead'));
+    tally(check(leads && leads[0] && leads[0].email === 'teste@example.com', 'email correto no lead'));
+
+    // B7. Estado de obrigado visível
+    console.log('\n  [B7] Estado de obrigado');
+    const thanksVisible = await page.evaluate(() => {
+      const el = document.getElementById('leadThanks');
+      return el ? el.style.display !== 'none' : false;
+    });
+    tally(check(thanksVisible, 'Estado de obrigado visível após submit'));
+
+    // B8. Botão #btnPdf presente
+    console.log('\n  [B8] Botão PDF');
+    const pdfBtn = await page.locator('#btnPdf').count();
+    tally(check(pdfBtn > 0, 'Botão #btnPdf presente'));
+
+    // B9. Sem erros JS
+    console.log('\n  [B9] Erros de JavaScript');
+    tally(check(jsErrors.length === 0, jsErrors.length ? 'Erros: ' + jsErrors.join(' | ') : 'Sem erros JS'));
+
+    await page.screenshot({ path: path.join(screenshotsDir, 'pessoal-resultado.png') });
+    info('Screenshot: tests/screenshots/pessoal-resultado.png');
+    await page.close();
+  }
+
+  // ══════════════════════════════════════════════════════
   // TEMA PERSISTE ENTRE PÁGINAS
   // ══════════════════════════════════════════════════════
   console.log('\n══════════════════════════════════════');

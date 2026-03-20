@@ -1104,6 +1104,26 @@
     </div>
   </div>
 
+  <!-- ── CTA CALCULAR ── -->
+  <div style="text-align:center; padding:2rem 0 1rem;" class="appear">
+    <button id="btnCalcular" onclick="saveAndRedirect()" style="
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.9rem 2.4rem;
+      font-family: var(--body);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    " onmouseover="this.style.transform='translateY(-2px)';this.style.background='var(--green-light)'"
+       onmouseout="this.style.transform='';this.style.background='var(--green)'">
+      Calcular minha pegada
+    </button>
+  </div>
+
   <!-- ── DICAS ── -->
   <div class="tips-section appear">
     <h2>Como reduzir sua pegada</h2>
@@ -1180,6 +1200,26 @@
 <footer>
   CarbonôMetro Brasil &nbsp;·&nbsp; Fatores de emissão baseados em dados MCTI, SEEG e IPCC AR6 &nbsp;·&nbsp; Estimativas educacionais
 </footer>
+
+<!-- ── LOADING OVERLAY ── -->
+<div id="calcOverlay" style="
+  display:none; position:fixed; inset:0; z-index:9000;
+  background:rgba(8,15,8,0.92); backdrop-filter:blur(8px);
+  flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;
+">
+  <svg width="120" height="120" viewBox="0 0 120 120" id="overlayGauge">
+    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(90,155,60,0.15)" stroke-width="8"/>
+    <circle cx="60" cy="60" r="50" fill="none" stroke="var(--green)" stroke-width="8"
+      stroke-linecap="round" stroke-dasharray="80 234.6" transform="rotate(-90 60 60)">
+      <animateTransform attributeName="transform" type="rotate"
+        from="-90 60 60" to="270 60 60" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+  <div id="overlayMsg" style="
+    font-family:var(--mono); font-size:0.8rem; letter-spacing:0.1em;
+    color:var(--text-2); text-transform:uppercase;
+  ">Analisando sua pegada...</div>
+</div>
 
 <script>
   // ═══ EMISSION FACTORS (kg CO₂ eq.) ═══
@@ -1346,6 +1386,84 @@
 
   // Init
   calc();
+
+  // ── Salvar e redirecionar ──
+  function saveAndRedirect() {
+    calc(); // garante emis atualizado
+
+    const total  = emis.t + emis.e + emis.a + emis.c;
+    const totalT = total / 1000;
+
+    let color, statusTxt;
+    if (total === 0) {
+      color = '#3a5c30'; statusTxt = 'Preencha abaixo';
+    } else if (total < 2200) {
+      color = '#5da83c'; statusTxt = 'Abaixo da média brasileira 🌱';
+    } else if (total < 4700) {
+      color = '#c8882e'; statusTxt = 'Entre Brasil e média mundial';
+    } else if (total < 10000) {
+      color = '#b85030'; statusTxt = 'Acima da média mundial';
+    } else {
+      color = '#8b2010'; statusTxt = 'Pegada muito elevada';
+    }
+
+    const pct = {
+      t: total > 0 ? Math.round(emis.t / total * 100) : 0,
+      e: total > 0 ? Math.round(emis.e / total * 100) : 0,
+      a: total > 0 ? Math.round(emis.a / total * 100) : 0,
+      c: total > 0 ? Math.round(emis.c / total * 100) : 0,
+    };
+
+    const result = {
+      total, totalT,
+      emis: { t: emis.t, e: emis.e, a: emis.a, c: emis.c },
+      pct,
+      color,
+      statusTxt,
+      inputs: {
+        carro:     v('s-carro'),
+        tipoCarro: sv('tipo-carro'),
+        moto:      v('s-moto'),
+        aviao:     v('s-aviao'),
+        onibus:    v('s-onibus'),
+        luz:       v('s-luz'),
+        gas:       v('s-gas'),
+        pessoas:   sv('pessoas'),
+        solar:     sv('solar'),
+        dieta:     sv('dieta'),
+        local:     v('s-local'),
+        desp:      v('s-desp'),
+        roupas:    v('s-roupas'),
+        eletro:    v('s-eletro'),
+        consumo:   sv('consumo'),
+        delivery:  sv('delivery'),
+      },
+      savedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem('cm_pessoal_result', JSON.stringify(result));
+
+    // Mostra overlay e cicla mensagens
+    const overlay = document.getElementById('calcOverlay');
+    const msgEl   = document.getElementById('overlayMsg');
+    overlay.style.display = 'flex';
+
+    const msgs = [
+      'Analisando sua pegada...',
+      'Calculando comparações...',
+      'Gerando insights...',
+    ];
+    let mi = 0;
+    const iv = setInterval(() => {
+      mi = (mi + 1) % msgs.length;
+      msgEl.textContent = msgs[mi];
+    }, 800);
+
+    setTimeout(() => {
+      clearInterval(iv);
+      window.location.href = 'pessoal-resultado.html';
+    }, 2500);
+  }
 
   // ── Tema claro/escuro ──
   const SUN  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;

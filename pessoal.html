@@ -301,7 +301,10 @@
       margin-top: 3.5rem;
       animation: riseUp 0.9s 0.5s ease both;
       color: var(--text-3);
+      text-decoration: none;
+      transition: color 0.2s;
     }
+    .scroll-cue:hover { color: var(--green-light); }
     .scroll-cue span {
       font-family: var(--mono);
       font-size: 0.6rem;
@@ -734,14 +737,14 @@
     </div>
   </div>
 
-  <div class="scroll-cue" style="margin-top:4.5rem;">
+  <a href="#calculadora" class="scroll-cue" style="margin-top:4.5rem;">
     <span>Calcule agora</span>
     <div class="arrow"></div>
-  </div>
+  </a>
 </section>
 
 <!-- ═══ CALCULATOR ═══ -->
-<main class="calc-wrap">
+<main id="calculadora" class="calc-wrap">
 
   <div class="section-head appear">
     <h2>Preencha cada categoria</h2>

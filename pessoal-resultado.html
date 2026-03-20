@@ -137,7 +137,7 @@
     .leaf {
       position: fixed;
       pointer-events: none;
-      z-index: 0;
+      z-index: 1;
       opacity: 0.04;
     }
     .leaf-1 { top: 10%; left: 5%;  width: 200px; transform: rotate(-20deg); }
@@ -152,7 +152,7 @@
     [data-theme="light"] .leaf-5 { opacity: 0.08; }
 
     /* conteúdo acima do glow/folhas */
-    .page-wrap { position: relative; z-index: 1; }
+    .page-wrap { position: relative; z-index: 2; }
 
     /* ─── MAIN CONTENT ─── */
     .page-wrap {
@@ -168,48 +168,56 @@
     }
     .meter-wrap {
       position: relative;
-      width: min(300px, 80vw); height: min(300px, 80vw);
+      width: min(290px, 80vw); height: min(290px, 80vw);
       margin-bottom: 1.5rem;
+      animation: riseUp 0.9s 0.2s ease both;
     }
-    .meter-svg { width: 100%; height: 100%; }
-    .meter-track { fill: none; stroke: var(--surface-3); stroke-width: 14; }
+    @keyframes riseUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .meter-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .meter-track { fill: none; stroke: var(--surface-3); stroke-width: 7; }
     .meter-fill {
-      fill: none; stroke: var(--green); stroke-width: 14;
+      fill: none; stroke: var(--green); stroke-width: 7;
       stroke-linecap: round;
-      transform-origin: center;
-      transform: rotate(-90deg);
-      transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1), stroke 0.4s;
+      transition: stroke-dashoffset 0.9s cubic-bezier(0.34,1.4,0.64,1), stroke 0.5s ease;
+      filter: drop-shadow(0 0 10px currentColor);
     }
     .meter-center {
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 0.15rem;
+      align-items: center; justify-content: center;
+      text-align: center; pointer-events: none;
     }
     .meter-kg {
-      font-family: var(--display); font-size: 2.6rem; font-weight: 400;
-      letter-spacing: -0.03em; line-height: 1; transition: color 0.4s;
+      font-family: var(--mono); font-size: 2.6rem; font-weight: 300;
+      letter-spacing: -0.02em; line-height: 1; transition: color 0.5s ease;
     }
     .meter-unit {
-      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
-      color: var(--text-3); text-transform: uppercase;
+      font-family: var(--mono); font-size: 0.62rem; color: var(--text-3);
+      letter-spacing: 0.1em; margin-top: 0.3rem;
     }
     .meter-status {
-      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em;
-      color: var(--text-2); text-transform: uppercase; margin-top: 0.2rem;
+      font-family: var(--display); font-style: italic;
+      font-size: 0.82rem; color: var(--text-2);
+      margin-top: 0.6rem; max-width: 130px; line-height: 1.3;
     }
     .benchmarks {
-      display: flex; justify-content: space-between; width: 100%;
-      margin-top: 0.5rem;
+      position: absolute; inset: -30px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 10px 0; pointer-events: none;
     }
-    .bm {
-      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em;
-      color: var(--text-3); text-align: center;
-    }
-    .bm-br { color: var(--amber); }
+    .bm { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.07em; line-height: 1.4; }
+    .bm-br    { color: var(--amber); }
     .bm-world { color: var(--blue); }
 
     .res-title {
-      font-family: var(--display); font-size: 2rem; font-weight: 400;
+      font-family: var(--display);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.1;
+      text-align: center;
       margin-bottom: 0.5rem;
     }
     .res-title em { font-style: italic; font-weight: 200; color: var(--green-light); }
@@ -550,10 +558,10 @@
           <div class="meter-unit">tCO₂ / ANO</div>
           <div class="meter-status" id="resMeterStatus">—</div>
         </div>
-      </div>
-      <div class="benchmarks" style="width:min(300px,80vw);">
-        <div class="bm bm-br">▲ BR<br>2,2 t</div>
-        <div class="bm bm-world" style="text-align:right;">▲ Mundo<br>4,7 t</div>
+        <div class="benchmarks">
+          <div class="bm bm-br">▲ BR<br>2,2 t</div>
+          <div class="bm bm-world" style="text-align:right;">▲ Mundo<br>4,7 t</div>
+        </div>
       </div>
     </div>
 

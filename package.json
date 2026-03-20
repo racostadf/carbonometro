@@ -1,0 +1,14 @@
+{
+  "name": "carbonometro",
+  "version": "1.0.0",
+  "description": "Calculadora de pegada de carbono pessoal e empresarial — GHG Protocol / MCTI 2023",
+  "scripts": {
+    "test": "node tests/test.js"
+  },
+  "keywords": ["carbono", "ghg", "sustentabilidade", "esg"],
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.58.2"
+  }
+}

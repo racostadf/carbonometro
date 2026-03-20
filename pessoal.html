@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <script>(function(){var t=localStorage.getItem('cmTheme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarbonôMetro — Calcule Sua Pegada de Carbono</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,600;1,9..144,200;1,9..144,400&family=DM+Mono:wght@300;400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080f08;
+      --bg-2:      #0d1a0d;
+      --surface:   #122012;
+      --surface-2: #192d19;
+      --surface-3: #203920;
+      --border:        rgba(90, 155, 60, 0.12);
+      --border-bright: rgba(90, 155, 60, 0.28);
+      --green:       #5da83c;
+      --green-light: #7ec45e;
+      --green-pale:  #b8d8a0;
+      --amber:       #c8882e;
+      --amber-light: #dba84e;
+      --blue:        #6b9ac4;
+      --red:         #b85030;
+      --red-light:   #d4724e;
+      --text:   #dce8d0;
+      --text-2: #8aaa78;
+      --text-3: #4a6840;
+      --display: 'Fraunces', Georgia, serif;
+      --mono:    'DM Mono', 'Courier New', monospace;
+      --body:    'Lato', sans-serif;
+      --header-bg:  rgba(8, 15, 8, 0.90);
+      --grain-opacity: 0.45;
+    }
+
+    [data-theme="light"] {
+      --bg:        #f4f8f1;
+      --bg-2:      #eaf2e5;
+      --surface:   #e2ecdb;
+      --surface-2: #d4e5cb;
+      --surface-3: #c4d9b8;
+      --border:        rgba(40, 105, 18, 0.15);
+      --border-bright: rgba(40, 105, 18, 0.35);
+      --green:       #2a7818;
+      --green-light: #389a20;
+      --green-pale:  #1c5010;
+      --amber:       #9a5c08;
+      --amber-light: #c07818;
+      --blue:        #28599a;
+      --red:         #8c1e08;
+      --red-light:   #b83218;
+      --text:   #141e0e;
+      --text-2: #385828;
+      --text-3: #658050;
+      --header-bg:  rgba(244, 248, 241, 0.94);
+      --grain-opacity: 0.08;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* Grain texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--header-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .theme-toggle {
+      background: none; border: 1px solid var(--border-bright);
+      border-radius: 50%; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-3); flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover { color: var(--green-light); border-color: var(--green-light); }
+    .back-link {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
+      color: var(--text-3); text-decoration: none; text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--green-light); }
+
+    .logo {
+      font-family: var(--display);
+      font-size: 1.35rem;
+      font-weight: 400;
+      color: var(--green-light);
+      letter-spacing: -0.025em;
+    }
+    .logo em {
+      font-style: italic;
+      font-weight: 200;
+      color: var(--text-3);
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 2.2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.3; transform: scale(0.6); }
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 7rem 2rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 45%, rgba(35, 85, 15, 0.22) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 40% at 15% 85%, rgba(20, 50, 10, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 30% at 85% 15%, rgba(10, 35, 5, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Organic leaf shapes */
+    .leaf {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.04;
+    }
+    .leaf-1 { top: 10%; left: 5%;  width: 200px; transform: rotate(-20deg); }
+    .leaf-2 { bottom: 15%; right: 3%; width: 280px; transform: rotate(30deg); }
+
+    .hero-title {
+      font-family: var(--display);
+      font-size: clamp(2.6rem, 7vw, 5.2rem);
+      font-weight: 400;
+      line-height: 1.08;
+      text-align: center;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      animation: riseUp 0.9s ease both;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--green-pale);
+    }
+
+    .hero-sub {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-3);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 3.5rem;
+      animation: riseUp 0.9s 0.1s ease both;
+    }
+
+    /* ─── METER ─── */
+    .meter-wrap {
+      position: relative;
+      width: min(290px, 80vw);
+      height: min(290px, 80vw);
+      animation: riseUp 0.9s 0.2s ease both;
+    }
+
+    .meter-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .meter-track {
+      fill: none;
+      stroke: var(--surface-3);
+      stroke-width: 7;
+    }
+
+    .meter-fill {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 7;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.9s cubic-bezier(0.34, 1.4, 0.64, 1),
+                  stroke 0.5s ease;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .meter-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .meter-kg {
+      font-family: var(--mono);
+      font-size: 2.6rem;
+      font-weight: 300;
+      line-height: 1;
+      transition: color 0.5s ease;
+      letter-spacing: -0.02em;
+    }
+
+    .meter-unit {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text-3);
+      letter-spacing: 0.1em;
+      margin-top: 0.3rem;
+    }
+
+    .meter-status {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--text-2);
+      margin-top: 0.6rem;
+      max-width: 130px;
+      line-height: 1.3;
+    }
+
+    /* benchmark ticks */
+    .benchmarks {
+      position: absolute;
+      inset: -30px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 10px 0;
+      pointer-events: none;
+    }
+    .bm {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.07em;
+      line-height: 1.4;
+    }
+    .bm-br    { color: var(--amber); }
+    .bm-world { color: var(--blue); }
+
+    .scroll-cue {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 3.5rem;
+      animation: riseUp 0.9s 0.5s ease both;
+      color: var(--text-3);
+    }
+    .scroll-cue span {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .arrow {
+      width: 18px; height: 18px;
+      border-right: 1px solid var(--text-3);
+      border-bottom: 1px solid var(--text-3);
+      transform: rotate(45deg);
+      animation: bob 2s ease infinite;
+    }
+
+    @keyframes bob    { 0%,100% { transform: rotate(45deg) translateY(0); } 50% { transform: rotate(45deg) translateY(5px); } }
+    @keyframes riseUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── CALC WRAPPER ─── */
+    .calc-wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .section-head {
+      text-align: center;
+      padding: 5rem 0 2.5rem;
+    }
+    .section-head h2 {
+      font-family: var(--display);
+      font-size: clamp(1.9rem, 4.5vw, 3rem);
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+    }
+    .section-head p {
+      color: var(--text-2);
+      font-size: 0.9rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ─── CATEGORY CARD ─── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 2.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: var(--border-bright); }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--green) 0%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-bg-num {
+      position: absolute;
+      top: 1rem; right: 1.5rem;
+      font-family: var(--display);
+      font-size: 6rem;
+      font-weight: 200;
+      color: var(--surface-2);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-icon {
+      width: 44px; height: 44px;
+      border: 1px solid var(--border-bright);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--green-light);
+    }
+
+    .card-title    { font-family: var(--display); font-size: 1.5rem; font-weight: 400; color: var(--text); }
+    .card-subtitle { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .card-emission {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--green);
+      background: rgba(93, 168, 60, 0.08);
+      border: 1px solid rgba(93, 168, 60, 0.18);
+      padding: 0.15rem 0.65rem;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+
+    /* ─── FIELDS ─── */
+    .fields { display: grid; gap: 1.5rem; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 580px) { .field-row { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 0.45rem; }
+
+    label {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .lv {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--green-light);
+      white-space: nowrap;
+    }
+
+    /* Range slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 3px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      background: var(--surface-3);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 8px rgba(93,168,60,0.5);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+      box-shadow: 0 0 14px rgba(93,168,60,0.7);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+
+    /* Select */
+    select {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.7rem 2.5rem 0.7rem 1rem;
+      font-family: var(--body);
+      font-size: 0.85rem;
+      font-weight: 300;
+      border-radius: 2px;
+      cursor: pointer;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a6840'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+    }
+    select:focus { border-color: var(--green); }
+
+    /* ─── RESULTS ─── */
+    .results {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 2.5rem;
+      margin: 1rem 0 2rem;
+    }
+
+    .results-title {
+      font-family: var(--display);
+      font-size: 1.7rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .status-msg {
+      border: 1px solid rgba(93,168,60,0.2);
+      background: rgba(93,168,60,0.06);
+      border-radius: 2px;
+      padding: 1.1rem 1.4rem;
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 0.98rem;
+      color: var(--green-pale);
+      margin-bottom: 2rem;
+      transition: all 0.5s;
+      line-height: 1.5;
+    }
+
+    /* Breakdown grid */
+    .breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 580px) { .breakdown { grid-template-columns: 1fr; } }
+
+    .bd-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.2rem;
+    }
+    .bd-name { font-family: var(--mono); font-size: 0.6rem; color: var(--text-3); letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+    .bd-val  { font-family: var(--mono); font-size: 1.5rem; font-weight: 300; color: var(--text); line-height: 1; }
+    .bd-bar-wrap { height: 3px; background: var(--surface-3); border-radius: 2px; margin: 0.65rem 0 0.3rem; overflow: hidden; }
+    .bd-bar  { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.34,1.4,0.64,1); }
+    .bd-pct  { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); }
+
+    /* divider */
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.8rem 0; }
+
+    /* Comparison bars */
+    .comp-title {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text-3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    .comp-rows { display: grid; gap: 1rem; }
+
+    .comp-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 80px;
+      align-items: center;
+      gap: 1rem;
+    }
+    .comp-label { font-size: 0.78rem; color: var(--text-2); }
+    .comp-bar-bg {
+      height: 5px;
+      background: var(--surface-3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .comp-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.8s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    .fill-user   { background: var(--green); }
+    .fill-brasil { background: var(--amber); }
+    .fill-mundo  { background: var(--blue); }
+
+    .comp-val { font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); text-align: right; }
+
+    /* ─── TIPS ─── */
+    .tips-section { padding: 2rem 0 6rem; }
+    .tips-section h2 {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .tips-sub { color: var(--text-2); font-size: 0.88rem; margin-bottom: 2rem; }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+
+    .tip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.5rem;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .tip:hover { transform: translateY(-4px); border-color: var(--border-bright); }
+    .tip-icon  { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-bright); color: var(--green-light); margin-bottom: 0.9rem; }
+    .tip-title { font-family: var(--display); font-size: 1rem; font-weight: 400; color: var(--text); margin-bottom: 0.35rem; }
+    .tip-text  { font-size: 0.78rem; color: var(--text-2); line-height: 1.55; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text-3);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .appear {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .appear.in { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 700px) {
+      header { padding: 0.9rem 1.2rem; }
+      .back-link span { display: none; }
+      .logo { font-size: 1.1rem; }
+      .hero { padding: 6rem 1.2rem 4rem; }
+      .meter-wrap { width: min(260px, 76vw); height: min(260px, 76vw); }
+      .calc-wrap { padding: 0 1rem 3rem; }
+      .card { padding: 1.8rem 1.2rem; }
+      .card-bg-num { font-size: 4.5rem; }
+      .results { padding: 1.8rem 1.2rem; }
+      .comp-row { grid-template-columns: 90px 1fr 60px; }
+      .bd-row { grid-template-columns: 90px 1fr 55px; }
+      .section-head { padding: 3.5rem 0 2rem; }
+      .section-head h2 { font-size: 1.7rem; }
+    }
+    @media (max-width: 400px) {
+      .meter-wrap { width: min(230px, 82vw); height: min(230px, 82vw); }
+      .meter-kg { font-size: 1.7rem; }
+      .hero-title { font-size: 2.2rem; }
+      .back-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <a href="index.html" class="back-link">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Início
+  </a>
+  <div class="logo">CarbonôMetro <em>Brasil</em></div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
+      <span id="themeIcon"></span>
+    </button>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Tempo real
+    </div>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <!-- Decorative leaves (SVG) -->
+  <svg class="leaf leaf-1" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+    <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+    <line x1="100" y1="180" x2="60" y2="140" stroke="#5da83c" stroke-width="0.8"/>
+    <line x1="100" y1="200" x2="140" y2="160" stroke="#5da83c" stroke-width="0.8"/>
+    <line x1="100" y1="140" x2="65" y2="100" stroke="#5da83c" stroke-width="0.8"/>
+    <line x1="100" y1="150" x2="135" y2="110" stroke="#5da83c" stroke-width="0.8"/>
+  </svg>
+  <svg class="leaf leaf-2" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 280 C20 200 0 100 100 20 C200 100 180 200 100 280Z" fill="#5da83c"/>
+    <line x1="100" y1="280" x2="100" y2="20" stroke="#5da83c" stroke-width="1.5"/>
+    <line x1="100" y1="180" x2="60" y2="140" stroke="#5da83c" stroke-width="0.8"/>
+    <line x1="100" y1="200" x2="140" y2="160" stroke="#5da83c" stroke-width="0.8"/>
+  </svg>
+
+  <h1 class="hero-title">Sua <em>pegada</em> de<br>carbono, revelada</h1>
+  <p class="hero-sub">Calcule · Compare · Reduza</p>
+
+  <!-- Meter -->
+  <div style="position:relative;">
+    <div class="meter-wrap">
+      <svg class="meter-svg" viewBox="0 0 290 290" id="meterSvg">
+        <circle class="meter-track" cx="145" cy="145" r="118"/>
+        <circle class="meter-fill" id="meterFill" cx="145" cy="145" r="118"
+                stroke-dasharray="741.4" stroke-dashoffset="741.4"/>
+      </svg>
+      <div class="meter-center">
+        <div class="meter-kg" id="meterKg">0,0</div>
+        <div class="meter-unit">tCO₂ / ANO</div>
+        <div class="meter-status" id="meterStatus">Preencha abaixo</div>
+      </div>
+    </div>
+    <div class="benchmarks" style="bottom:-38px;">
+      <div class="bm bm-br">▲ BR<br>2,2 t</div>
+      <div class="bm bm-world" style="text-align:right;">▲ Mundo<br>4,7 t</div>
+    </div>
+  </div>
+
+  <div class="scroll-cue" style="margin-top:4.5rem;">
+    <span>Calcule agora</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ═══ CALCULATOR ═══ -->
+<main class="calc-wrap">
+
+  <div class="section-head appear">
+    <h2>Preencha cada categoria</h2>
+    <p>Os valores são anuais. O total atualiza instantaneamente enquanto você preenche.</p>
+  </div>
+
+  <!-- ── 01 TRANSPORTE ── -->
+  <div class="card appear" id="c-transporte">
+    <div class="card-bg-num">01</div>
+    <div class="card-head">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 17H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2"/>
+          <path d="M19 17h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/>
+          <rect x="5" y="7" width="14" height="10" rx="2"/>
+          <circle cx="7.5" cy="17" r="1.5"/>
+          <circle cx="16.5" cy="17" r="1.5"/>
+          <path d="M5 9l2-4h10l2 4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Transporte</div>
+        <div class="card-subtitle">Mobilidade &amp; Deslocamentos</div>
+        <div class="card-emission" id="em-transporte">0 kg CO₂</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field-row">
+        <div class="field">
+          <label>Km de carro por semana <span class="lv" id="v-carro">0 km</span></label>
+          <input type="range" id="s-carro" min="0" max="1000" value="0" step="10" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Tipo de veículo</label>
+          <select id="tipo-carro" onchange="calc()">
+            <option value="0.171">Gasolina / Flex gasolina</option>
+            <option value="0.13">Flex etanol / Etanol</option>
+            <option value="0.10">Híbrido</option>
+            <option value="0.045">Elétrico (matriz BR)</option>
+            <option value="0">Não tenho carro</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Km de moto por semana <span class="lv" id="v-moto">0 km</span></label>
+          <input type="range" id="s-moto" min="0" max="500" value="0" step="5" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Horas de voo por ano <span class="lv" id="v-aviao">0 h</span></label>
+          <input type="range" id="s-aviao" min="0" max="200" value="0" step="1" oninput="calc()">
+        </div>
+      </div>
+      <div class="field">
+        <label>Km de ônibus / metrô / trem por semana <span class="lv" id="v-onibus">0 km</span></label>
+        <input type="range" id="s-onibus" min="0" max="500" value="0" step="5" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 02 ENERGIA ── -->
+  <div class="card appear" id="c-energia">
+    <div class="card-bg-num">02</div>
+    <div class="card-head">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Energia Doméstica</div>
+        <div class="card-subtitle">Eletricidade &amp; Gás</div>
+        <div class="card-emission" id="em-energia">0 kg CO₂</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field-row">
+        <div class="field">
+          <label>Consumo mensal de luz (kWh) <span class="lv" id="v-luz">0 kWh</span></label>
+          <input type="range" id="s-luz" min="0" max="1000" value="0" step="10" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Gás de cozinha por mês (kg) <span class="lv" id="v-gas">0 kg</span></label>
+          <input type="range" id="s-gas" min="0" max="25" value="0" step="0.5" oninput="calc()">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Pessoas na residência</label>
+          <select id="pessoas" onchange="calc()">
+            <option value="1">1 pessoa</option>
+            <option value="2">2 pessoas</option>
+            <option value="3">3 pessoas</option>
+            <option value="4" selected>4 pessoas</option>
+            <option value="5">5 pessoas</option>
+            <option value="6">6+ pessoas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Energia solar?</label>
+          <select id="solar" onchange="calc()">
+            <option value="1">Não tenho</option>
+            <option value="0.4">Sim, parcialmente</option>
+            <option value="0.05">Sim, totalmente</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 03 ALIMENTAÇÃO ── -->
+  <div class="card appear" id="c-alimentacao">
+    <div class="card-bg-num">03</div>
+    <div class="card-head">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 22c1-4 4-8 10-10C18 10 22 6 22 2c-4 0-8 4-10 10C10 6 6 2 2 2c0 4 4 8 10 10"/>
+          <path d="M12 12 L12 22"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Alimentação</div>
+        <div class="card-subtitle">Dieta &amp; Hábitos Alimentares</div>
+        <div class="card-emission" id="em-alimentacao">0 kg CO₂</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field">
+        <label>Descreva melhor sua dieta</label>
+        <select id="dieta" onchange="calc()">
+          <option value="3200">Carnívoro — carne em quase todas as refeições</option>
+          <option value="2400" selected>Onívoro — carne várias vezes por semana</option>
+          <option value="1700">Flexitariano — raramente como carne vermelha</option>
+          <option value="1100">Vegetariano — sem carne, mas com laticínios e ovos</option>
+          <option value="650">Vegano — sem nenhum produto animal</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Alimentos locais / orgânicos <span class="lv" id="v-local">0%</span></label>
+          <input type="range" id="s-local" min="0" max="100" value="0" step="5" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Desperdício alimentar <span class="lv" id="v-desp">médio</span></label>
+          <input type="range" id="s-desp" min="0.8" max="1.35" value="1.0" step="0.05" oninput="calc()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 04 CONSUMO ── -->
+  <div class="card appear" id="c-consumo">
+    <div class="card-bg-num">04</div>
+    <div class="card-head">
+      <div class="card-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-title">Consumo</div>
+        <div class="card-subtitle">Roupas, Eletrônicos &amp; Compras</div>
+        <div class="card-emission" id="em-consumo">0 kg CO₂</div>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field-row">
+        <div class="field">
+          <label>Roupas novas por ano <span class="lv" id="v-roupas">0 peças</span></label>
+          <input type="range" id="s-roupas" min="0" max="100" value="0" step="1" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Eletrônicos novos por ano <span class="lv" id="v-eletro">0 itens</span></label>
+          <input type="range" id="s-eletro" min="0" max="10" value="0" step="1" oninput="calc()">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Perfil de consumo geral</label>
+          <select id="consumo" onchange="calc()">
+            <option value="180">Minimalista — compro só o essencial</option>
+            <option value="550" selected>Moderado — consumo com consciência</option>
+            <option value="1100">Consumidor ativo — gosto de novidades</option>
+            <option value="2000">Intensivo — compras frequentes e variadas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Entregas / compras online por semana</label>
+          <select id="delivery" onchange="calc()">
+            <option value="0">Raramente</option>
+            <option value="40" selected>1–2 vezes</option>
+            <option value="120">3–5 vezes</option>
+            <option value="280">Quase diariamente</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RESULTS ── -->
+  <div class="results appear">
+    <h2 class="results-title">Resultado da sua análise</h2>
+    <div class="status-msg" id="statusMsg">
+      Preencha as seções acima para ver sua análise completa.
+    </div>
+
+    <div class="breakdown">
+      <div class="bd-item">
+        <div class="bd-name">TRANSPORTE</div>
+        <div class="bd-val" id="bd-transporte">0 kg</div>
+        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-transporte" style="width:0%;background:var(--green)"></div></div>
+        <div class="bd-pct" id="pct-transporte">0% do total</div>
+      </div>
+      <div class="bd-item">
+        <div class="bd-name">ENERGIA</div>
+        <div class="bd-val" id="bd-energia">0 kg</div>
+        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-energia" style="width:0%;background:var(--amber)"></div></div>
+        <div class="bd-pct" id="pct-energia">0% do total</div>
+      </div>
+      <div class="bd-item">
+        <div class="bd-name">ALIMENTAÇÃO</div>
+        <div class="bd-val" id="bd-alimentacao">0 kg</div>
+        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-alimentacao" style="width:0%;background:var(--blue)"></div></div>
+        <div class="bd-pct" id="pct-alimentacao">0% do total</div>
+      </div>
+      <div class="bd-item">
+        <div class="bd-name">CONSUMO</div>
+        <div class="bd-val" id="bd-consumo">0 kg</div>
+        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-consumo" style="width:0%;background:var(--red-light)"></div></div>
+        <div class="bd-pct" id="pct-consumo">0% do total</div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="comp-title">Comparação anual (toneladas de CO₂ equivalente)</div>
+    <div class="comp-rows">
+      <div class="comp-row">
+        <div class="comp-label">Você</div>
+        <div class="comp-bar-bg"><div class="comp-bar-fill fill-user" id="cmp-user" style="width:0%"></div></div>
+        <div class="comp-val" id="cmp-user-val">0,0 t</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-label" style="color:var(--amber);">Média Brasil</div>
+        <div class="comp-bar-bg"><div class="comp-bar-fill fill-brasil" id="cmp-brasil" style="width:23.4%"></div></div>
+        <div class="comp-val" style="color:var(--amber);">2,2 t</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-label" style="color:var(--blue);">Média Mundial</div>
+        <div class="comp-bar-bg"><div class="comp-bar-fill fill-mundo" id="cmp-mundo" style="width:50%"></div></div>
+        <div class="comp-val" style="color:var(--blue);">4,7 t</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DICAS ── -->
+  <div class="tips-section appear">
+    <h2>Como reduzir sua pegada</h2>
+    <p class="tips-sub">Pequenas mudanças geram grande impacto. Comece pelo que for mais relevante para o seu perfil.</p>
+    <div class="tips-grid">
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/>
+            <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5L9 11l3-3 2 3h4"/>
+            <path d="M9 11L6.5 14h5"/>
+          </svg>
+        </div>
+        <div class="tip-title">Mobilidade ativa</div>
+        <div class="tip-text">Substituir 10 km de carro diários por bicicleta pode evitar até 600 kg CO₂/ano — e ainda faz bem à saúde.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 22c1-4 4-8 10-10C18 10 22 6 22 2c-4 0-8 4-10 10C10 6 6 2 2 2c0 4 4 8 10 10"/>
+            <path d="M12 12L12 22"/>
+          </svg>
+        </div>
+        <div class="tip-title">Reduza a carne vermelha</div>
+        <div class="tip-text">Uma refeição vegetariana a mais por semana pode reduzir sua pegada alimentar em até 200 kg CO₂ por ano.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </div>
+        <div class="tip-title">Energia solar</div>
+        <div class="tip-text">Painéis fotovoltaicos podem zerar a emissão da sua conta de luz e ainda gerar créditos para abater futuras faturas.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-2.764L7.196 9.5"/>
+            <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-2.75l-4-7a1.83 1.83 0 0 0-3.196.034l-.5.864"/>
+            <path d="m14 7-3-3 3-3"/><path d="M8.5 8.5 5 5l3-3"/>
+          </svg>
+        </div>
+        <div class="tip-title">Consuma menos, consuma melhor</div>
+        <div class="tip-text">Brechós, eletrônicos recondicionados e a regra "use até o fim" eliminam toneladas de emissões embutidas.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 21 4s-2 0-3.5 1.5L14 9 5.8 7.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 3.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+          </svg>
+        </div>
+        <div class="tip-title">Voe com consciência</div>
+        <div class="tip-text">Um voo transatlântico emite o equivalente a meses de outras atividades. Prefira trem, videoconferências e férias locais.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="tip-title">Casa eficiente</div>
+        <div class="tip-text">LED, chuveiro de baixo fluxo, geladeira eficiente e boas janelas reduzem consumo e emissões em até 30%.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  CarbonôMetro Brasil &nbsp;·&nbsp; Fatores de emissão baseados em dados MCTI, SEEG e IPCC AR6 &nbsp;·&nbsp; Estimativas educacionais
+</footer>
+
+<script>
+  // ═══ EMISSION FACTORS (kg CO₂ eq.) ═══
+  const F = {
+    moto:        0.103,   // kg CO2/km
+    aviao:       248,     // kg CO2/hora de voo (média nacional ~800km/h × 0.255 × 1.2 RFI)
+    onibus:      0.072,   // kg CO2/km pax
+    eletricidade: 0.0817, // kg CO2/kWh — fator médio MCTI 2023
+    gas:         3.0,     // kg CO2/kg GLP
+    roupa:       12,      // kg CO2/peça nova
+    eletronico:  145,     // kg CO2/aparelho
+  };
+
+  const emis = { t: 0, e: 0, a: 0, c: 0 };
+
+  function v(id)  { return parseFloat(document.getElementById(id).value) || 0; }
+  function sv(id) { return document.getElementById(id).value; }
+  function set(id, txt) { document.getElementById(id).textContent = txt; }
+  function fmt(n) { return Math.round(n).toLocaleString('pt-BR'); }
+
+  function calc() {
+    // ── Label updates ──
+    set('v-carro',  v('s-carro')  + ' km');
+    set('v-moto',   v('s-moto')   + ' km');
+    set('v-aviao',  v('s-aviao')  + ' h');
+    set('v-onibus', v('s-onibus') + ' km');
+    set('v-luz',    v('s-luz')    + ' kWh');
+    set('v-gas',    v('s-gas')    + ' kg');
+    set('v-roupas', v('s-roupas') + ' peças');
+    set('v-eletro', v('s-eletro') + ' itens');
+    set('v-local',  v('s-local')  + '%');
+    const dv = v('s-desp');
+    set('v-desp', dv <= 0.85 ? 'muito baixo' : dv <= 1.05 ? 'médio' : dv <= 1.2 ? 'alto' : 'muito alto');
+
+    // ── Transporte ──
+    const carroKm  = v('s-carro')  * 52 * v('tipo-carro');
+    const motoKm   = v('s-moto')   * 52 * F.moto;
+    const vooH     = v('s-aviao')  * F.aviao;
+    const onibusKm = v('s-onibus') * 52 * F.onibus;
+    emis.t = Math.round(carroKm + motoKm + vooH + onibusKm);
+
+    // ── Energia ──
+    const luzAnual = v('s-luz') * 12 * F.eletricidade * v('solar');
+    const gasAnual = v('s-gas') * 12 * F.gas;
+    emis.e = Math.round((luzAnual + gasAnual) / v('pessoas'));
+
+    // ── Alimentação ──
+    const localFactor = 1 - (v('s-local') / 100) * 0.15;
+    emis.a = Math.round(v('dieta') * localFactor * v('s-desp'));
+
+    // ── Consumo ──
+    emis.c = Math.round(
+      v('s-roupas') * F.roupa +
+      v('s-eletro') * F.eletronico +
+      v('consumo') +
+      v('delivery')
+    );
+
+    updateDisplay();
+    updateRangeTracks();
+  }
+
+  function updateDisplay() {
+    const total = emis.t + emis.e + emis.a + emis.c;
+    const totalT = total / 1000;
+
+    // ── Meter ──
+    const circ   = 2 * Math.PI * 118; // r=118 → 741.4
+    const maxKg  = 20000;
+    const pct    = Math.min(total / maxKg, 1);
+    const offset = circ * (1 - pct);
+
+    const fill = document.getElementById('meterFill');
+    fill.style.strokeDashoffset = offset;
+    fill.style.strokeDasharray  = circ;
+
+    let color, statusTxt;
+    if (total === 0) {
+      color = '#3a5c30'; statusTxt = 'Preencha abaixo';
+    } else if (total < 2200) {
+      color = '#5da83c'; statusTxt = 'Abaixo da média brasileira 🌱';
+    } else if (total < 4700) {
+      color = '#c8882e'; statusTxt = 'Entre Brasil e média mundial';
+    } else if (total < 10000) {
+      color = '#b85030'; statusTxt = 'Acima da média mundial';
+    } else {
+      color = '#8b2010'; statusTxt = 'Pegada muito elevada';
+    }
+
+    fill.style.stroke = color;
+    const kg = document.getElementById('meterKg');
+    kg.textContent = (total / 1000).toFixed(1).replace('.', ',');
+    kg.style.color  = color;
+    set('meterStatus', statusTxt);
+
+    // ── Category badges ──
+    set('em-transporte',  fmt(emis.t) + ' kg CO₂');
+    set('em-energia',     fmt(emis.e) + ' kg CO₂');
+    set('em-alimentacao', fmt(emis.a) + ' kg CO₂');
+    set('em-consumo',     fmt(emis.c) + ' kg CO₂');
+
+    // ── Breakdown bars ──
+    const cats = [
+      { k: 'transporte',  v: emis.t },
+      { k: 'energia',     v: emis.e },
+      { k: 'alimentacao', v: emis.a },
+      { k: 'consumo',     v: emis.c },
+    ];
+    cats.forEach(c => {
+      const p = total > 0 ? Math.round(c.v / total * 100) : 0;
+      set('bd-' + c.k,  fmt(c.v) + ' kg');
+      document.getElementById('bar-' + c.k).style.width = p + '%';
+      set('pct-' + c.k, p + '% do total');
+    });
+
+    // ── Comparison bars (normalised to max of user, 2200, 4700 capped at 10000) ──
+    const compMax = Math.max(total, 10000);
+    document.getElementById('cmp-user').style.width   = Math.min(total / compMax * 100, 100) + '%';
+    document.getElementById('cmp-user').style.background = color;
+    document.getElementById('cmp-brasil').style.width = Math.min(2200 / compMax * 100, 100) + '%';
+    document.getElementById('cmp-mundo').style.width  = Math.min(4700 / compMax * 100, 100) + '%';
+    set('cmp-user-val', totalT.toFixed(1).replace('.', ',') + ' t');
+
+    // ── Status message ──
+    let msg;
+    if (total === 0) {
+      msg = 'Preencha as seções acima para ver sua análise completa.';
+    } else if (total < 1500) {
+      msg = 'Excelente! Sua pegada é notavelmente baixa. Você serve de inspiração para quem está ao redor.';
+    } else if (total < 2200) {
+      msg = 'Muito bem! Você está abaixo da média brasileira (2,2 tCO₂/ano). Continue com esses hábitos sustentáveis.';
+    } else if (total < 4700) {
+      msg = 'Sua pegada está acima da média brasileira, mas abaixo da média mundial. Pequenas mudanças podem fazer grande diferença.';
+    } else if (total < 10000) {
+      msg = 'Sua pegada está acima da média mundial (4,7 tCO₂/ano). Considere adotar as dicas abaixo para reduzi-la.';
+    } else {
+      msg = 'Pegada muito elevada — mas o importante é começar a mudar. Pequenas ações consistentes constroem um grande impacto.';
+    }
+    const sm = document.getElementById('statusMsg');
+    sm.textContent = msg;
+    sm.style.borderColor = color + '44';
+    sm.style.background  = color + '14';
+  }
+
+  function updateRangeTracks() {
+    document.querySelectorAll('input[type="range"]').forEach(r => {
+      const pct = ((r.value - r.min) / (r.max - r.min)) * 100;
+      r.style.background = `linear-gradient(to right, var(--green) ${pct}%, var(--surface-3) ${pct}%)`;
+    });
+  }
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.appear').forEach(el => obs.observe(el));
+
+  // Init
+  calc();
+
+  // ── Tema claro/escuro ──
+  const SUN  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const MOON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  function updateIcon() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.getElementById('themeIcon').innerHTML = isLight ? MOON : SUN;
+  }
+  function toggleTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    localStorage.setItem('cmTheme', isLight ? 'dark' : 'light');
+    updateIcon();
+  }
+  updateIcon();
+</script>
+</body>
+</html>

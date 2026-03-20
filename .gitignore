@@ -1,0 +1,11 @@
+# Dependências
+node_modules/
+
+# Screenshots de teste (geradas automaticamente)
+tests/screenshots/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log

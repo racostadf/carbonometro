@@ -1048,62 +1048,6 @@
     </div>
   </div>
 
-  <!-- ── RESULTS ── -->
-  <div class="results appear">
-    <h2 class="results-title">Resultado da sua análise</h2>
-    <div class="status-msg" id="statusMsg">
-      Preencha as seções acima para ver sua análise completa.
-    </div>
-
-    <div class="breakdown">
-      <div class="bd-item">
-        <div class="bd-name">TRANSPORTE</div>
-        <div class="bd-val" id="bd-transporte">0 kg</div>
-        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-transporte" style="width:0%;background:var(--green)"></div></div>
-        <div class="bd-pct" id="pct-transporte">0% do total</div>
-      </div>
-      <div class="bd-item">
-        <div class="bd-name">ENERGIA</div>
-        <div class="bd-val" id="bd-energia">0 kg</div>
-        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-energia" style="width:0%;background:var(--amber)"></div></div>
-        <div class="bd-pct" id="pct-energia">0% do total</div>
-      </div>
-      <div class="bd-item">
-        <div class="bd-name">ALIMENTAÇÃO</div>
-        <div class="bd-val" id="bd-alimentacao">0 kg</div>
-        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-alimentacao" style="width:0%;background:var(--blue)"></div></div>
-        <div class="bd-pct" id="pct-alimentacao">0% do total</div>
-      </div>
-      <div class="bd-item">
-        <div class="bd-name">CONSUMO</div>
-        <div class="bd-val" id="bd-consumo">0 kg</div>
-        <div class="bd-bar-wrap"><div class="bd-bar" id="bar-consumo" style="width:0%;background:var(--red-light)"></div></div>
-        <div class="bd-pct" id="pct-consumo">0% do total</div>
-      </div>
-    </div>
-
-    <hr>
-
-    <div class="comp-title">Comparação anual (toneladas de CO₂ equivalente)</div>
-    <div class="comp-rows">
-      <div class="comp-row">
-        <div class="comp-label">Você</div>
-        <div class="comp-bar-bg"><div class="comp-bar-fill fill-user" id="cmp-user" style="width:0%"></div></div>
-        <div class="comp-val" id="cmp-user-val">0,0 t</div>
-      </div>
-      <div class="comp-row">
-        <div class="comp-label" style="color:var(--amber);">Média Brasil</div>
-        <div class="comp-bar-bg"><div class="comp-bar-fill fill-brasil" id="cmp-brasil" style="width:23.4%"></div></div>
-        <div class="comp-val" style="color:var(--amber);">2,2 t</div>
-      </div>
-      <div class="comp-row">
-        <div class="comp-label" style="color:var(--blue);">Média Mundial</div>
-        <div class="comp-bar-bg"><div class="comp-bar-fill fill-mundo" id="cmp-mundo" style="width:50%"></div></div>
-        <div class="comp-val" style="color:var(--blue);">4,7 t</div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── CTA CALCULAR ── -->
   <div style="text-align:center; padding:2rem 0 1rem;" class="appear">
     <button id="btnCalcular" onclick="saveAndRedirect()" style="
@@ -1328,47 +1272,7 @@
     set('em-alimentacao', fmt(emis.a) + ' kg CO₂');
     set('em-consumo',     fmt(emis.c) + ' kg CO₂');
 
-    // ── Breakdown bars ──
-    const cats = [
-      { k: 'transporte',  v: emis.t },
-      { k: 'energia',     v: emis.e },
-      { k: 'alimentacao', v: emis.a },
-      { k: 'consumo',     v: emis.c },
-    ];
-    cats.forEach(c => {
-      const p = total > 0 ? Math.round(c.v / total * 100) : 0;
-      set('bd-' + c.k,  fmt(c.v) + ' kg');
-      document.getElementById('bar-' + c.k).style.width = p + '%';
-      set('pct-' + c.k, p + '% do total');
-    });
-
-    // ── Comparison bars (normalised to max of user, 2200, 4700 capped at 10000) ──
-    const compMax = Math.max(total, 10000);
-    document.getElementById('cmp-user').style.width   = Math.min(total / compMax * 100, 100) + '%';
-    document.getElementById('cmp-user').style.background = color;
-    document.getElementById('cmp-brasil').style.width = Math.min(2200 / compMax * 100, 100) + '%';
-    document.getElementById('cmp-mundo').style.width  = Math.min(4700 / compMax * 100, 100) + '%';
-    set('cmp-user-val', totalT.toFixed(1).replace('.', ',') + ' t');
-
-    // ── Status message ──
-    let msg;
-    if (total === 0) {
-      msg = 'Preencha as seções acima para ver sua análise completa.';
-    } else if (total < 1500) {
-      msg = 'Excelente! Sua pegada é notavelmente baixa. Você serve de inspiração para quem está ao redor.';
-    } else if (total < 2200) {
-      msg = 'Muito bem! Você está abaixo da média brasileira (2,2 tCO₂/ano). Continue com esses hábitos sustentáveis.';
-    } else if (total < 4700) {
-      msg = 'Sua pegada está acima da média brasileira, mas abaixo da média mundial. Pequenas mudanças podem fazer grande diferença.';
-    } else if (total < 10000) {
-      msg = 'Sua pegada está acima da média mundial (4,7 tCO₂/ano). Considere adotar as dicas abaixo para reduzi-la.';
-    } else {
-      msg = 'Pegada muito elevada — mas o importante é começar a mudar. Pequenas ações consistentes constroem um grande impacto.';
-    }
-    const sm = document.getElementById('statusMsg');
-    sm.textContent = msg;
-    sm.style.borderColor = color + '44';
-    sm.style.background  = color + '14';
+    // (breakdown e comparison movidos para pessoal-resultado.html)
   }
 
   function updateRangeTracks() {
